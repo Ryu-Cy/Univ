@@ -1,0 +1,16 @@
+Modify the tutorial codes and implement the following functions,
+
+1. Change the background color using keyboard inputs. (2 pt)
+	1.1 “r”: red, “g”: green, “b”: blue.
+	1.2 The background color should be displayed until it is changed.
+
+2 Display three polygons (i.e., rectangle, pentagon, hexagon, etc.). (3 pt)
+	2.1 Use a different shape and a different color for each polygon.
+	2.2 Each polygon should rotate continuously against a different axis (i.e., x, y, z-axis).
+	2.3 All polygons should be displayed at the same time.
+
+3 Display two different fill modes using the keyboard inputs. (2 pt)
+	3.1 “w”: wireframe, “s”: solid
+
+4 Change the color brightness by modifying the pixel shader and using keyboard inputs. (3 pt)
+	4.1 “1”: full brightness, “2”: half brightness

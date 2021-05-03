@@ -1,0 +1,19 @@
+Modify the tutorial codes and implement the following functions,
+
+1. Display 3D models loaded from external files. (4 pt)
+	1.1 Add an OBJ parser to the framework that loads a 3D model directly from an OBJ file.
+	(Do NOT use the TXT files.)
+	1.2 Search and display three 3D models at the same time.
+	(Do NOT use simple primitives such as cube, cylinder, pyramid, etc.)
+	1.3 Use a different texture for each model.
+	1.4 Rotate each model continuously against the up axis (y-axis).
+
+2 Display a ground plane. (2 pt)
+	2.1 Use a plane that covers an entire ground and shows the horizon.
+	2.2 Apply a texture with patterns to the plane.
+
+3 Display different filtering effects using the keyboard inputs. (4 pt)
+	3.1 “1”: the point filter mode (D3D11_FILTER_MIN_MAG_MIP_POINT)
+	3.2 “2”: the linear filter mode (D3D11_FILTER_MIN_MAG_MIP_LINEAR)
+	3.3 “3”: the anisotropic filter mode (D3D11_FILTER_ANISOTROPIC)
+	3.4 The visual difference between each filter mode should be clearly displayed.
