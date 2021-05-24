@@ -557,6 +557,11 @@ void D3DClass::GetWorldMatrix(D3DXMATRIX& worldMatrix)
 	return;
 }
 
+void D3DClass::SetWorldMatrix(D3DXMATRIX& worldMatrix)
+{
+	m_worldMatrix = worldMatrix;
+	return;
+}
 
 void D3DClass::GetOrthoMatrix(D3DXMATRIX& orthoMatrix)
 {

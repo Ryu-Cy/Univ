@@ -46,6 +46,8 @@ public:
 	void GetWorldMatrix(D3DXMATRIX&);
 	void GetOrthoMatrix(D3DXMATRIX&);
 
+	void SetWorldMatrix(D3DXMATRIX&);
+
 	void GetVideoCardInfo(char*, int&);
 
 	void TurnZBufferOn();
