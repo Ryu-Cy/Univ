@@ -42,14 +42,10 @@ public:
 
 	LRESULT CALLBACK MessageHandler(HWND, UINT, WPARAM, LPARAM);
 
-	//float lX, lY;
-
 private:
 	bool Frame();
 	void InitializeWindows(int&, int&);
 	void ShutdownWindows();
-
-	//float GetlXlY(int);
 
 private:
 	LPCWSTR m_applicationName;

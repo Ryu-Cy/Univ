@@ -398,13 +398,11 @@ bool GraphicsClass::Render(float rotation)
 
 	// Render the model using the light shader.
 	if (getCard)
-	{
-		worldMatrix[1] = worldMatrix[2] * worldMatrix[3] * worldMatrix[4] * worldMatrix[5];
-	}
+		for (int i = 2; i < 6; i++)
+			worldMatrix[1] *= worldMatrix[i];
 	else
-	{
 		worldMatrix[1] = worldMatrix[6];
-	}
+
 	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model[1]->GetIndexCount(), worldMatrix[1], viewMatrix, projectionMatrix1,
 		m_Model[1]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
 		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());

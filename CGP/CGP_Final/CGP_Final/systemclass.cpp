@@ -11,8 +11,6 @@ SystemClass::SystemClass()
 	m_Fps = 0;
 	m_Cpu = 0;
 	m_Timer = 0;
-	//lX = 0.0f;
-	//lY = 0.0f;
 }
 
 
@@ -196,7 +194,7 @@ void SystemClass::Run()
 		}
 		m_Graphics->lX += m_Input->GetMouselX();
 		m_Graphics->lY += m_Input->GetMouselY();
-		m_Graphics->GetCamera()->SetRotation(m_Graphics->lY * 0.03f, m_Graphics->lX * 0.03f, 0.0f);// 근데 이거 더럽다 나중에 옮겨야겠다 그러게
+		m_Graphics->GetCamera()->SetRotation(m_Graphics->lY * 0.03f, m_Graphics->lX * 0.03f, 0.0f);
 	}
 
 	return;
