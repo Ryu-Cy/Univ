@@ -8,13 +8,11 @@ GraphicsClass::GraphicsClass()
 {
 	m_D3D = 0;
 	m_Camera = 0;
-	m_Model = 0;
-	m_Model1 = 0;
 	m_LightShader = 0;
 	m_Light = 0;
+	for (int i = 0; i < 2; i++)
+		m_Model[i] = 0;
 
-	//m_Input = 0;
-	//m_System = 0;
 	getCard = false;
 
 	camRotX = 0.0f;
@@ -71,14 +69,14 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	//	m_Camera->SetPosition(0.0f, 0.5f, -3.0f);
 
 	// Create the model object.
-	m_Model = new ModelClass;
-	if (!m_Model)
+	m_Model[0] = new ModelClass;
+	if (!m_Model[0])
 	{
 		return false;
 	}
 
 	// Initialize the model object.
-	result = m_Model->Initialize(m_D3D->GetDevice(), "../CGP_Final/data/Map/map.obj", L"../CGP_Final/data/Map/model_01_AlbedoTransparency.jpg");
+	result = m_Model[0]->Initialize(m_D3D->GetDevice(), "../CGP_Final/data/Map/map.obj", L"../CGP_Final/data/Map/model_01_AlbedoTransparency.jpg");
 
 	if (!result)
 	{
@@ -87,14 +85,14 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	// Create the model object.
-	m_Model1 = new ModelClass;
-	if (!m_Model1)
+	m_Model[1] = new ModelClass;
+	if (!m_Model[1])
 	{
 		return false;
 	}
 
 	// Initialize the model object.
-	result = m_Model1->Initialize(m_D3D->GetDevice(), "../CGP_Final/data/cube.obj", L"../CGP_Final/data/seafloor.dds");
+	result = m_Model[1]->Initialize(m_D3D->GetDevice(), "../CGP_Final/data/cube.obj", L"../CGP_Final/data/seafloor.dds");
 
 	if (!result)
 	{
@@ -220,19 +218,19 @@ void GraphicsClass::Shutdown()
 	}
 
 	// Release the model object.
-	if (m_Model)
+	if (m_Model[0])
 	{
-		m_Model->Shutdown();
-		delete m_Model;
-		m_Model = 0;
+		m_Model[0]->Shutdown();
+		delete m_Model[0];
+		m_Model[0] = 0;
 	}
 
 	// Release the model object.
-	if (m_Model1)
+	if (m_Model[1])
 	{
-		m_Model1->Shutdown();
-		delete m_Model1;
-		m_Model1 = 0;
+		m_Model[1]->Shutdown();
+		delete m_Model[1];
+		m_Model[1] = 0;
 	}
 
 	// Release the camera object.
@@ -308,11 +306,6 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 	camRotZ += m_Camera->GetMoveZ() * 1.5f * cos(m_Camera->GetRotY());
 	camRotZ += m_Camera->GetMoveX() * 1.5f * -sin(m_Camera->GetRotY());
 
-	/*if (((m_Model->GetModelPosition(1).x <= camRotX || m_Model->GetModelPosition(1).x >= camRotX) && 
-		(m_Model->GetModelPosition(1).z <= camRotZ || m_Model->GetModelPosition(1).z >= camRotZ)))
-	{
-		m_Camera->SetPosition(camRotX, 0.0f, camRotZ);
-	}*/
 	m_Camera->SetPosition(camRotX, 100.0f, camRotZ);
 
 	if ((m_Camera->GetPosition().x >= -0.5f && m_Camera->GetPosition().x <= 0.5f) && (m_Camera->GetPosition().z >= 4.5f && m_Camera->GetPosition().z <= 5.5f))
@@ -323,48 +316,9 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 	return true;
 }
 
-//bool GraphicsClass::Frame(int fps, int cpu, float frameTime)
-//{
-//	bool result;
-//	static float rotation = 0.0f;
-//
-//	// Update the rotation variable each frame.
-//	rotation += (float)D3DX_PI * 0.005f;
-//	if (rotation > 360.0f)
-//	{
-//		rotation -= 360.0f;
-//	}
-//
-//	// Set the frames per second.
-//	result = m_Text->SetFps(fps, m_D3D->GetDeviceContext());
-//	if (!result)
-//	{
-//		return false;
-//	}
-//
-//	// Set the cpu usage.
-//	result = m_Text->SetCpu(cpu, m_D3D->GetDeviceContext());
-//	if (!result)
-//	{
-//		return false;
-//	}
-//
-//	// Render the graphics scene.
-//	result = Render(rotation);
-//	if (!result)
-//	{
-//		return false;
-//	}
-//
-//	// Set the position of the camera.
-////	m_Camera->SetPosition(0.0f, 0.0f, -10.0f); 
-//
-//	return true;
-//}
-
 bool GraphicsClass::Render(float rotation)
 {
-	D3DXMATRIX worldMatrix, worldMatrix1, worldMatrix2, worldMatrix3, worldMatrix4, worldMatrix5, worldMatrix6, viewMatrix, projectionMatrix, projectionMatrix1, orthoMatrix;
+	D3DXMATRIX worldMatrix[7], viewMatrix, projectionMatrix, projectionMatrix1, orthoMatrix;
 	bool result;
 
 
@@ -376,13 +330,8 @@ bool GraphicsClass::Render(float rotation)
 
 	// Get the world, view, and projection matrices from the camera and d3d objects.
 	m_Camera->GetViewMatrix(viewMatrix);
-	m_D3D->GetWorldMatrix(worldMatrix);
-	m_D3D->GetWorldMatrix(worldMatrix1);
-	m_D3D->GetWorldMatrix(worldMatrix2);
-	m_D3D->GetWorldMatrix(worldMatrix3);
-	m_D3D->GetWorldMatrix(worldMatrix4);
-	m_D3D->GetWorldMatrix(worldMatrix5);
-	m_D3D->GetWorldMatrix(worldMatrix6);
+	for (int i = 0; i < 7; i++)
+		m_D3D->GetWorldMatrix(worldMatrix[i]);
 	m_D3D->GetProjectionMatrix(projectionMatrix);
 	m_D3D->GetProjectionMatrix(projectionMatrix1);
 
@@ -401,7 +350,7 @@ bool GraphicsClass::Render(float rotation)
 	}
 
 	// Render the bitmap with the texture shader.
-	result = m_TextureShader->Render(m_D3D->GetDeviceContext(), m_Bitmap->GetIndexCount(), worldMatrix, viewMatrix, orthoMatrix, m_Bitmap->GetTexture());
+	result = m_TextureShader->Render(m_D3D->GetDeviceContext(), m_Bitmap->GetIndexCount(), worldMatrix[0], viewMatrix, orthoMatrix, m_Bitmap->GetTexture());
 	if (!result)
 	{
 		return false;
@@ -412,7 +361,7 @@ bool GraphicsClass::Render(float rotation)
 	m_D3D->TurnOnAlphaBlending();
 
 	// Render the text strings.
-	result = m_Text->Render(m_D3D->GetDeviceContext(), worldMatrix, orthoMatrix);
+	result = m_Text->Render(m_D3D->GetDeviceContext(), worldMatrix[0], orthoMatrix);
 	if (!result)
 	{
 		return false;
@@ -425,10 +374,10 @@ bool GraphicsClass::Render(float rotation)
 	m_D3D->TurnZBufferOn();
 
 	// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
-	m_Model->Render(m_D3D->GetDeviceContext());
+	m_Model[0]->Render(m_D3D->GetDeviceContext());
 
-	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix1,
-		m_Model->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
+	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model[0]->GetIndexCount(), worldMatrix[0], viewMatrix, projectionMatrix1,
+		m_Model[0]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
 		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
 	if (!result)
 	{
@@ -436,29 +385,28 @@ bool GraphicsClass::Render(float rotation)
 	}
 
 	// Rotate the world matrix by the rotation value so that the triangle will spin.
-	D3DXMatrixTranslation(&worldMatrix1, 0.7f, -0.5f, 3.5f);
-	D3DXMatrixRotationX(&worldMatrix2, lY * 0.03f * 0.0174532925f);
-	D3DXMatrixRotationY(&worldMatrix3, lX * 0.03f * 0.0174532925f);
-	D3DXMatrixTranslation(&worldMatrix4, m_Camera->GetPosition().x, m_Camera->GetPosition().y, m_Camera->GetPosition().z);
-	
-	D3DXMatrixTranslation(&worldMatrix5, 0.0f, 100.0f, 5.0f);
+	D3DXMatrixTranslation(&worldMatrix[2], 0.7f, -0.5f, 3.5f);
+	D3DXMatrixRotationX(&worldMatrix[3], lY * 0.03f * 0.0174532925f);
+	D3DXMatrixRotationY(&worldMatrix[4], lX * 0.03f * 0.0174532925f);
+	D3DXMatrixTranslation(&worldMatrix[5], m_Camera->GetPosition().x, m_Camera->GetPosition().y, m_Camera->GetPosition().z);
+	D3DXMatrixTranslation(&worldMatrix[6], 0.0f, 100.0f, 5.0f);
 
 	//m_D3D->SetWorldMatrix(worldMatrix1);
 
 	// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
-	m_Model1->Render(m_D3D->GetDeviceContext());
+	m_Model[1]->Render(m_D3D->GetDeviceContext());
 
 	// Render the model using the light shader.
 	if (getCard)
 	{
-		worldMatrix6 = worldMatrix1 * worldMatrix2 * worldMatrix3 * worldMatrix4;
+		worldMatrix[1] = worldMatrix[2] * worldMatrix[3] * worldMatrix[4] * worldMatrix[5];
 	}
 	else
 	{
-		worldMatrix6 = worldMatrix5;
+		worldMatrix[1] = worldMatrix[6];
 	}
-	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model1->GetIndexCount(), worldMatrix6, viewMatrix, projectionMatrix1,
-		m_Model1->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
+	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model[1]->GetIndexCount(), worldMatrix[1], viewMatrix, projectionMatrix1,
+		m_Model[1]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
 		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
 	if (!result)
 	{
