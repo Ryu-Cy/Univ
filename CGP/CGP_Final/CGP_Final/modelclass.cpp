@@ -324,3 +324,18 @@ void ModelClass::ReleaseModel()
 
 	return;
 }
+
+D3DXVECTOR3 ModelClass::GetModelPosition(int num)
+{
+	for (int i = 0; i < m_vertexCount; i++)
+	{
+		if (num == 1)
+		{
+			return D3DXVECTOR3(m_model[i].x, m_model[i].y, m_model[i].z);
+		}
+		else if (num == 2)
+		{
+			return D3DXVECTOR3(m_model[i].nx, m_model[i].ny, m_model[i].nz);
+		}
+	}
+}

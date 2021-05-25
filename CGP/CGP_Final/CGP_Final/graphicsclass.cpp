@@ -258,18 +258,12 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 	bool result;
 	static float rotation = 0.0f;
 	
-
-	/*lX += m_Input->GetMouselX();
-	lY += m_Input->GetMouselY();*/
-
-	
 	// Update the rotation variable each frame.
 	rotation += (float)D3DX_PI * 0.005f;
 	if (rotation > 360.0f)
 	{
 		rotation -= 360.0f;
 	}
-	//rotation = m_Input->GetMouselX() * 3.0f;
 
 	// Set the location of the mouse.
 	result = m_Text->SetMousePosition(mouseX, mouseY, m_D3D->GetDeviceContext());
@@ -305,9 +299,15 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 	camRotZ += m_Camera->GetMoveZ() * 1.5f * cos(m_Camera->GetRotY());
 	camRotZ += m_Camera->GetMoveX() * 1.5f * -sin(m_Camera->GetRotY());
 
-	m_Camera->SetPosition(camRotX, 0.0f, camRotZ);
-	//0.0f <= m_Camera->GetPosition().x <= 1.0f
-	if (10.0f <= m_Camera->GetPosition().z <= 11.0f)
+	if (((m_Model->GetModelPosition(1).x <= camRotX || m_Model->GetModelPosition(1).x >= camRotX) && 
+		(m_Model->GetModelPosition(1).z <= camRotZ || m_Model->GetModelPosition(1).z >= camRotZ)))
+	{
+
+		m_Camera->SetPosition(camRotX, 0.0f, camRotZ);
+	}
+
+
+	if ((m_Camera->GetPosition().x >= -0.5f && m_Camera->GetPosition().x <= 0.5f )&& (m_Camera->GetPosition().z >= 9.5f && m_Camera->GetPosition().z <= 10.5f))
 	{
 		getCard = true;
 	}

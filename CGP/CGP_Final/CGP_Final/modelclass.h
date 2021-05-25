@@ -52,6 +52,7 @@ public:
 	int GetIndexCount();
 	ID3D11ShaderResourceView* GetTexture();
 
+	D3DXVECTOR3 GetModelPosition(int);
 
 private:
 	bool InitializeBuffers(ID3D11Device*);
