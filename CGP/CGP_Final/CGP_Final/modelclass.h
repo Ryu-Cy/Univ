@@ -40,6 +40,17 @@ private:
 		float nx, ny, nz;
 	};
 
+	struct VertexType1
+	{
+		float x, y, z;
+	};
+
+	struct FaceType
+	{
+		int vIndex1, vIndex2, vIndex3;
+		int tIndex1, tIndex2, tIndex3;
+		int nIndex1, nIndex2, nIndex3;
+	};
 public:
 	ModelClass();
 	ModelClass(const ModelClass&);
@@ -52,8 +63,9 @@ public:
 	int GetIndexCount();
 	ID3D11ShaderResourceView* GetTexture();
 
-	D3DXVECTOR3 GetModelPosition(int);
-
+	bool ReadFileCounts(const char*, int& vertexCount, int& textureCount, int& normalCount, int& faceCount);
+	bool LoadDataStructures(const char*, int vertexCount, int textureCount, int normalCount, int faceCount);
+	
 private:
 	bool InitializeBuffers(ID3D11Device*);
 	void ShutdownBuffers();
