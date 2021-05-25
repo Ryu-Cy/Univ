@@ -14,6 +14,7 @@ GraphicsClass::GraphicsClass()
 
 	//m_Input = 0;
 	//m_System = 0;
+	getCard = false;
 
 	camRotX = 0.0f;
 	camRotZ = -10.0f;
@@ -305,6 +306,11 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 	camRotZ += m_Camera->GetMoveX() * 1.5f * -sin(m_Camera->GetRotY());
 
 	m_Camera->SetPosition(camRotX, 0.0f, camRotZ);
+	//0.0f <= m_Camera->GetPosition().x <= 1.0f
+	if (10.0f <= m_Camera->GetPosition().z <= 11.0f)
+	{
+		getCard = true;
+	}
 	
 	return true;
 }
@@ -350,7 +356,7 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 
 bool GraphicsClass::Render(float rotation)
 {
-	D3DXMATRIX worldMatrix, worldMatrix1, worldMatrix2, worldMatrix3, worldMatrix4, worldMatrix5, viewMatrix, projectionMatrix, projectionMatrix1, orthoMatrix;
+	D3DXMATRIX worldMatrix, worldMatrix1, worldMatrix2, worldMatrix3, worldMatrix4, worldMatrix5, worldMatrix6, viewMatrix, projectionMatrix, projectionMatrix1, orthoMatrix;
 	bool result;
 
 
@@ -366,29 +372,36 @@ bool GraphicsClass::Render(float rotation)
 	m_D3D->GetWorldMatrix(worldMatrix1);
 	m_D3D->GetWorldMatrix(worldMatrix2);
 	m_D3D->GetWorldMatrix(worldMatrix3);
+	m_D3D->GetWorldMatrix(worldMatrix4);
+	m_D3D->GetWorldMatrix(worldMatrix5);
+	m_D3D->GetWorldMatrix(worldMatrix6);
 	m_D3D->GetProjectionMatrix(projectionMatrix);
 	m_D3D->GetProjectionMatrix(projectionMatrix1);
 
 	m_D3D->GetOrthoMatrix(orthoMatrix);
 
 	// Rotate the world matrix by the rotation value so that the triangle will spin.
-	// 타이틀/ 미니맵/ 인벤토리, 퀵슬롯/ 그림자/ 물, 불/ ㅇㅇ
-	//D3DXMatrixTranslation(&projectionMatrix, camRotX, 0.0f, camRotZ + 5.0f);
 	D3DXMatrixTranslation(&worldMatrix1, 0.0f, 0.0f, 5.0f);
 	D3DXMatrixRotationX(&worldMatrix2, lY * 0.03f * 0.0174532925f);
 	D3DXMatrixRotationY(&worldMatrix3, lX * 0.03f * 0.0174532925f);
 	D3DXMatrixTranslation(&worldMatrix4, m_Camera->GetPosition().x, m_Camera->GetPosition().y, m_Camera->GetPosition().z);
-	//D3DXMatrixRotationAxis(&worldMatrix2, new D3DXVECTOR3(camRotX, 0.0f, camRotZ), lY * 0.03f);
-	//D3DXMatrixTranslation(&worldMatrix2, m_Camera->GetRotation().y, -m_Camera->GetRotation().x, m_Camera->GetRotation().z * camRotZ);
 	
-	worldMatrix5 = worldMatrix1 * worldMatrix2 * worldMatrix3 * worldMatrix4;
+	D3DXMatrixTranslation(&worldMatrix6, 0.0f, 0.0f, 10.0f);
 
-	m_D3D->SetWorldMatrix(worldMatrix1);
+	//m_D3D->SetWorldMatrix(worldMatrix1);
 
 	// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
 	m_Model->Render(m_D3D->GetDeviceContext());
 
 	// Render the model using the light shader.
+	if (getCard)
+	{
+		worldMatrix5 = worldMatrix1 * worldMatrix2 * worldMatrix3 * worldMatrix4;
+	}
+	else
+	{
+		worldMatrix5 = worldMatrix6;
+	}
 	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix5, viewMatrix, projectionMatrix1,
 		m_Model->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
 		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());

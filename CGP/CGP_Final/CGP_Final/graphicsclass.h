@@ -55,6 +55,8 @@ public:
 
 	float lX, lY;
 
+	bool getCard;
+
 private:
 	D3DClass* m_D3D;
 	CameraClass* m_Camera;
