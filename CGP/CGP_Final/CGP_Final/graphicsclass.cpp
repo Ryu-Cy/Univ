@@ -65,7 +65,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 	// Set the initial position of the camera.
 	m_Camera->SetPosition(0.0f, 0.0f, -10.0f);
-	m_Camera->SetLookAt(0.0f, 0.0f, 1.0f);
+	m_Camera->SetLookAt(0.0f, 0.0f, 0.1f);
 	//	m_Camera->SetPosition(0.0f, 0.5f, -3.0f);
 
 	// Create the model[CardKey] object.
@@ -76,7 +76,9 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	// Initialize the model[CardKey] object.
-	result = m_Model[0]->Initialize(m_D3D->GetDevice(), "../CGP_Final/data/cube.obj", L"../CGP_Final/data/seafloor.dds", L"../CGP_Final/data/seafloor.dds", L"../CGP_Final/data/seafloor.dds", L"../CGP_Final/data/seafloor.dds");
+	result = m_Model[0]->Initialize(m_D3D->GetDevice(), "../CGP_Final/data/KeyCard/Chip_key_2/Material/key.obj", L"../CGP_Final/data/KeyCard/Chip_key_2/Texturizer/metal_1.jpg", 
+		L"../CGP_Final/data/KeyCard/Chip_key_2/Texturizer/stars-1920x1200-galaxy-4k-6362.jpg", L"../CGP_Final/data/KeyCard/Chip_key_2/Texturizer/Blury.jpg", 
+		L"../CGP_Final/data/KeyCard/Chip_key_2/Texturizer/Lake.jpg");
 
 	if (!result)
 	{
@@ -335,7 +337,7 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 
 	m_Camera->SetPosition(camRotX, 100.0f, camRotZ);
 
-	if ((m_Camera->GetPosition().x >= -0.5f && m_Camera->GetPosition().x <= 0.5f) && (m_Camera->GetPosition().z >= 4.5f && m_Camera->GetPosition().z <= 5.5f))
+	if ((m_Camera->GetPosition().x >= -1.0f && m_Camera->GetPosition().x <= 1.0f) && (m_Camera->GetPosition().z >= 4.5f && m_Camera->GetPosition().z <= 5.5f))
 	{
 		getCard = true;
 	}
@@ -345,8 +347,8 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 
 bool GraphicsClass::Render(float rotation)
 {
-	// worldMatrix[0-5] = CardKey, worldMatrix[6] = Map / Ui
-	D3DXMATRIX worldMatrix[7], viewMatrix, projectionMatrix, projectionMatrix1, orthoMatrix;
+	// worldMatrix[0-8] = CardKey, worldMatrix[9] = Map / Ui
+	D3DXMATRIX worldMatrix[10], viewMatrix, projectionMatrix, projectionMatrix1, orthoMatrix;
 	bool result;
 
 
@@ -358,7 +360,7 @@ bool GraphicsClass::Render(float rotation)
 
 	// Get the world, view, and projection matrices from the camera and d3d objects.
 	m_Camera->GetViewMatrix(viewMatrix);
-	for (int i = 0; i < 7; i++)
+	for (int i = 0; i < 10; i++)
 		m_D3D->GetWorldMatrix(worldMatrix[i]);
 	m_D3D->GetProjectionMatrix(projectionMatrix);
 	m_D3D->GetProjectionMatrix(projectionMatrix1);
@@ -402,11 +404,15 @@ bool GraphicsClass::Render(float rotation)
 	m_D3D->TurnZBufferOn();
 
 	// Rotate the world matrix by the rotation value so that the triangle will spin.
-	D3DXMatrixTranslation(&worldMatrix[1], 0.7f, -0.5f, 3.5f);
-	D3DXMatrixRotationX(&worldMatrix[2], lY * 0.03f * 0.0174532925f);
-	D3DXMatrixRotationY(&worldMatrix[3], lX * 0.03f * 0.0174532925f);
-	D3DXMatrixTranslation(&worldMatrix[4], m_Camera->GetPosition().x, m_Camera->GetPosition().y, m_Camera->GetPosition().z);
-	D3DXMatrixTranslation(&worldMatrix[5], 0.0f, 100.0f, 5.0f);
+	D3DXMatrixScaling(&worldMatrix[1], 0.2f, 0.15f, 0.2f);
+	D3DXMatrixTranslation(&worldMatrix[2], 0.8f, -0.5f, 3.5f);
+	D3DXMatrixRotationX(&worldMatrix[3], lY * 0.03f * 0.0174532925f);
+	D3DXMatrixRotationY(&worldMatrix[4], lX * 0.03f * 0.0174532925f);
+	D3DXMatrixTranslation(&worldMatrix[5], m_Camera->GetPosition().x, m_Camera->GetPosition().y, m_Camera->GetPosition().z);
+
+	D3DXMatrixScaling(&worldMatrix[6], 0.5f, 0.5f, 0.5f);
+	D3DXMatrixRotationY(&worldMatrix[7], 1.75f);
+	D3DXMatrixTranslation(&worldMatrix[8], 0.0f, 100.0f, 5.0f);
 
 	//m_D3D->SetWorldMatrix(worldMatrix1);
 
@@ -416,10 +422,11 @@ bool GraphicsClass::Render(float rotation)
 
 	// Render the model using the light shader.
 	if (getCard)
-		for (int i = 1; i < 5; i++)
+		for (int i = 1; i < 6; i++)
 			worldMatrix[0] *= worldMatrix[i];
 	else
-		worldMatrix[0] = worldMatrix[5];
+		for (int i = 6; i < 9; i++)
+			worldMatrix[0] *= worldMatrix[i];
 
 	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model[0]->GetIndexCount(), worldMatrix[0], viewMatrix, projectionMatrix1,
 		*m_Model[0]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
@@ -433,7 +440,7 @@ bool GraphicsClass::Render(float rotation)
 	// Map1-3
 	m_Model[1]->Render(m_D3D->GetDeviceContext());
 
-	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model[1]->GetIndexCount(), worldMatrix[6], viewMatrix, projectionMatrix1,
+	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model[1]->GetIndexCount(), worldMatrix[9], viewMatrix, projectionMatrix1,
 		*m_Model[1]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
 		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
 	if (!result)
@@ -443,7 +450,7 @@ bool GraphicsClass::Render(float rotation)
 
 	m_Model[2]->Render(m_D3D->GetDeviceContext());
 
-	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model[2]->GetIndexCount(), worldMatrix[6], viewMatrix, projectionMatrix1,
+	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model[2]->GetIndexCount(), worldMatrix[9], viewMatrix, projectionMatrix1,
 		*m_Model[2]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
 		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
 	if (!result)
@@ -453,7 +460,7 @@ bool GraphicsClass::Render(float rotation)
 
 	m_Model[3]->Render(m_D3D->GetDeviceContext());
 
-	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model[3]->GetIndexCount(), worldMatrix[6], viewMatrix, projectionMatrix1,
+	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model[3]->GetIndexCount(), worldMatrix[9], viewMatrix, projectionMatrix1,
 		*m_Model[3]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
 		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
 	if (!result)
