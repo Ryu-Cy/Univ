@@ -19,6 +19,9 @@
 #include "textureshaderclass.h"
 #include "bitmapclass.h"
 
+#include "skydomeclass.h"
+#include "skydomeshaderclass.h"
+
 #include "textclass.h"
 
 /////////////
@@ -69,6 +72,9 @@ private:
 	BitmapClass* m_Bitmap;
 
 	TextClass* m_Text;
+
+	SkyDomeClass* m_SkyDome;
+	SkyDomeShaderClass* m_SkyDomeShader;
 };
 
 #endif

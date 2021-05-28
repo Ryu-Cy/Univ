@@ -22,6 +22,9 @@ GraphicsClass::GraphicsClass()
 	m_Bitmap = 0;
 
 	m_Text = 0;
+
+	m_SkyDome = 0;
+	m_SkyDomeShader = 0;
 }
 
 
@@ -66,7 +69,6 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	// Set the initial position of the camera.
 	m_Camera->SetPosition(0.0f, 0.0f, -10.0f);
 	m_Camera->SetLookAt(0.0f, 0.0f, 0.1f);
-	//	m_Camera->SetPosition(0.0f, 0.5f, -3.0f);
 
 	// Create the model[CardKey] object.
 	m_Model[0] = new ModelClass;
@@ -94,7 +96,8 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	// Initialize the model[Map1] object.
-	result = m_Model[1]->Initialize(m_D3D->GetDevice(), "../CGP_Final/data/Map/map1.obj", L"../CGP_Final/data/Map/map11.jpg", L"../CGP_Final/data/Map/map12.jpg", L"../CGP_Final/data/Map/map13.jpg", L"../CGP_Final/data/Map/map14.jpg");
+	result = m_Model[1]->Initialize(m_D3D->GetDevice(), "../CGP_Final/data/Map/map1.obj", L"../CGP_Final/data/Map/map11.jpg",
+		L"../CGP_Final/data/Map/map12.jpg", L"../CGP_Final/data/Map/map13.jpg", L"../CGP_Final/data/Map/map14.jpg");
 
 	if (!result)
 	{
@@ -110,7 +113,8 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	// Initialize the model[Map2] object.
-	result = m_Model[2]->Initialize(m_D3D->GetDevice(), "../CGP_Final/data/Map/map2.obj", L"../CGP_Final/data/Map/map21.jpg", L"../CGP_Final/data/Map/map22.jpg", L"../CGP_Final/data/Map/map23.jpg", L"../CGP_Final/data/Map/map23.jpg");
+	result = m_Model[2]->Initialize(m_D3D->GetDevice(), "../CGP_Final/data/Map/map2.obj", L"../CGP_Final/data/Map/map21.jpg",
+		L"../CGP_Final/data/Map/map22.jpg", L"../CGP_Final/data/Map/map23.jpg", L"../CGP_Final/data/Map/map23.jpg");
 
 	if (!result)
 	{
@@ -126,7 +130,8 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	// Initialize the model[Map3] object.
-	result = m_Model[3]->Initialize(m_D3D->GetDevice(), "../CGP_Final/data/Map/map3.obj", L"../CGP_Final/data/Map/map31.jpg", L"../CGP_Final/data/Map/map32.jpg", L"../CGP_Final/data/Map/map33.jpg", L"../CGP_Final/data/Map/map34.jpg");
+	result = m_Model[3]->Initialize(m_D3D->GetDevice(), "../CGP_Final/data/Map/map3.obj", L"../CGP_Final/data/Map/map31.jpg", 
+		L"../CGP_Final/data/Map/map32.jpg", L"../CGP_Final/data/Map/map33.jpg", L"../CGP_Final/data/Map/map34.jpg");
 
 	if (!result)
 	{
@@ -214,6 +219,35 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	}
 
+	m_SkyDome = new SkyDomeClass;
+	if (!m_SkyDome)
+	{
+		return false;
+	}
+
+	// Initialize the sky dome object.
+	result = m_SkyDome->Initialize(m_D3D->GetDevice());
+	if (!result)
+	{
+		MessageBox(hwnd, L"Could not initialize the sky dome object.", L"Error", MB_OK);
+		return false;
+	}
+
+	// Create the sky dome shader object.
+	m_SkyDomeShader = new SkyDomeShaderClass;
+	if (!m_SkyDomeShader)
+	{
+		return false;
+	}
+
+	// Initialize the sky dome shader object.
+	result = m_SkyDomeShader->Initialize(m_D3D->GetDevice(), hwnd);
+	if (!result)
+	{
+		MessageBox(hwnd, L"Could not initialize the sky dome shader object.", L"Error", MB_OK);
+		return false;
+	}
+
 	return true;
 }
 
@@ -285,6 +319,22 @@ void GraphicsClass::Shutdown()
 		m_Text = 0;
 	}
 
+	// Release the sky dome object.
+	if (m_SkyDome)
+	{
+		m_SkyDome->Shutdown();
+		delete m_SkyDome;
+		m_SkyDome = 0;
+	}
+
+	// Release the sky dome shader object.
+	if (m_SkyDomeShader)
+	{
+		m_SkyDomeShader->Shutdown();
+		delete m_SkyDomeShader;
+		m_SkyDomeShader = 0;
+	}
+
 	return;
 }
 
@@ -348,8 +398,9 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 bool GraphicsClass::Render(float rotation)
 {
 	// worldMatrix[0-8] = CardKey, worldMatrix[9] = Map / Ui
-	D3DXMATRIX worldMatrix[10], viewMatrix, projectionMatrix, projectionMatrix1, orthoMatrix;
+	D3DXMATRIX worldMatrix[10], viewMatrix, projectionMatrix, orthoMatrix;
 	bool result;
+	D3DXVECTOR3 cameraPosition;
 
 
 	// Clear the buffers to begin the scene.
@@ -363,14 +414,29 @@ bool GraphicsClass::Render(float rotation)
 	for (int i = 0; i < 10; i++)
 		m_D3D->GetWorldMatrix(worldMatrix[i]);
 	m_D3D->GetProjectionMatrix(projectionMatrix);
-	m_D3D->GetProjectionMatrix(projectionMatrix1);
-
 	m_D3D->GetOrthoMatrix(orthoMatrix);
 
 	//m_D3D->SetWorldMatrix(worldMatrix);
 
+	// Get the position of the camera.
+	cameraPosition = m_Camera->GetPosition();
+
+	// Translate the sky dome to be centered around the camera position.
+	D3DXMatrixTranslation(&worldMatrix[9], cameraPosition.x, cameraPosition.y, cameraPosition.z);
+
+	// Turn off back face culling.
+	m_D3D->TurnOffCulling();
+
 	// Turn off the Z buffer to begin all 2D rendering.
 	m_D3D->TurnZBufferOff();
+
+	m_SkyDome->Render(m_D3D->GetDeviceContext());
+	m_SkyDomeShader->Render(m_D3D->GetDeviceContext(), m_SkyDome->GetIndexCount(), worldMatrix[9], viewMatrix, projectionMatrix,
+		m_SkyDome->GetApexColor(), m_SkyDome->GetCenterColor());
+
+	m_D3D->TurnOnCulling();
+
+	m_D3D->GetWorldMatrix(worldMatrix[9]);
 
 	// Put the bitmap vertex and index buffers on the graphics pipeline to prepare them for drawing.
 	result = m_Bitmap->Render(m_D3D->GetDeviceContext(), 200, 200);
@@ -428,7 +494,7 @@ bool GraphicsClass::Render(float rotation)
 		for (int i = 6; i < 9; i++)
 			worldMatrix[0] *= worldMatrix[i];
 
-	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model[0]->GetIndexCount(), worldMatrix[0], viewMatrix, projectionMatrix1,
+	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model[0]->GetIndexCount(), worldMatrix[0], viewMatrix, projectionMatrix,
 		*m_Model[0]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
 		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
 	if (!result)
@@ -440,7 +506,7 @@ bool GraphicsClass::Render(float rotation)
 	// Map1-3
 	m_Model[1]->Render(m_D3D->GetDeviceContext());
 
-	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model[1]->GetIndexCount(), worldMatrix[9], viewMatrix, projectionMatrix1,
+	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model[1]->GetIndexCount(), worldMatrix[9], viewMatrix, projectionMatrix,
 		*m_Model[1]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
 		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
 	if (!result)
@@ -450,7 +516,7 @@ bool GraphicsClass::Render(float rotation)
 
 	m_Model[2]->Render(m_D3D->GetDeviceContext());
 
-	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model[2]->GetIndexCount(), worldMatrix[9], viewMatrix, projectionMatrix1,
+	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model[2]->GetIndexCount(), worldMatrix[9], viewMatrix, projectionMatrix,
 		*m_Model[2]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
 		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
 	if (!result)
@@ -460,7 +526,7 @@ bool GraphicsClass::Render(float rotation)
 
 	m_Model[3]->Render(m_D3D->GetDeviceContext());
 
-	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model[3]->GetIndexCount(), worldMatrix[9], viewMatrix, projectionMatrix1,
+	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model[3]->GetIndexCount(), worldMatrix[9], viewMatrix, projectionMatrix,
 		*m_Model[3]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
 		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
 	if (!result)

@@ -69,6 +69,12 @@
     <ClInclude Include="texturearrayclass.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="skydomeclass.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="skydomeshaderclass.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="bitmapclass.cpp">
@@ -126,6 +132,12 @@
       <Filter>소스 파일</Filter>
     </ClCompile>
     <ClCompile Include="texturearrayclass.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="skydomeclass.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="skydomeshaderclass.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
