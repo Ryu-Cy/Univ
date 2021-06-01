@@ -52,9 +52,7 @@ public:
 
 	CameraClass* GetCamera();
 
-	float camRotX;
-	float	 camRotZ;
-
+	float camRotX, camRotY, camRotZ;
 	float lX, lY;
 
 	int mapNum;

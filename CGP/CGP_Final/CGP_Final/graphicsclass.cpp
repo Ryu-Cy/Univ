@@ -19,6 +19,7 @@ GraphicsClass::GraphicsClass()
 	getCard = false;
 
 	camRotX = 0.0f;
+	camRotY = 45.0f;
 	camRotZ = -10.0f;
 
 	m_TextureShader = 0;
@@ -400,14 +401,113 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 				camRotZ -= 0.75f;
 			else if (m_Camera->GetPosition().z < -675.0f)
 				camRotZ += 0.75f;
+
+			if (m_Camera->GetPosition().x <= -55.0f &&
+				(m_Camera->GetPosition().z < 425.0f && m_Camera->GetPosition().z > 175.0f))
+			{
+				inCorridor = 1;
+				camRotX -= 75.5f;
+				camRotY += 55.0f;
+			}
+			else if (m_Camera->GetPosition().x >= 55.0f &&
+				(m_Camera->GetPosition().z < 425.0f && m_Camera->GetPosition().z > 175.0f))
+			{
+				inCorridor = 2;
+				camRotX += 75.5f;
+				camRotY += 55.0f;
+			}
 		}
 		else if (inCorridor == 1)
 		{
+			if (m_Camera->GetPosition().x > -130.0f)
+			{
+				inCorridor = 0;
+				camRotX += 75.5f;
+				camRotY -= 55.0f;
+			}
+			else if (m_Camera->GetPosition().x < -130.0f && m_Camera->GetPosition().x > -175.0f)
+			{
+				if (m_Camera->GetPosition().z > 400.0f)
+				{
+					camRotZ -= 0.75f;
+				}
+				else if (m_Camera->GetPosition().z < 200.0f)
+				{
+					camRotZ += 0.75f;
+				}
+			}
+			else if (m_Camera->GetPosition().x < -175.0f && m_Camera->GetPosition().x > -200.0f)
+			{
+				if (m_Camera->GetPosition().z > 350.0f)
+				{
+					camRotZ -= 0.75f;
+				}
+				else if (m_Camera->GetPosition().z < 250.0f)
+				{
+					camRotZ += 0.75f;
+				}
+			}
 
+			if (m_Camera->GetPosition().z > 200.0f && m_Camera->GetPosition().z < 250.0f)
+			{
+				if (m_Camera->GetPosition().x < -170.0f)
+				{
+					camRotX += 0.75f;
+				}
+			}
+			else if (m_Camera->GetPosition().z > 350.0f && m_Camera->GetPosition().z < 400.0f)
+			{
+				if (m_Camera->GetPosition().x < -170.0f)
+				{
+					camRotX += 0.75f;
+				}
+			}
 		}
 		else if (inCorridor == 2)
 		{
+			if (m_Camera->GetPosition().x < 130.0f)
+			{
+				inCorridor = 0;
+				camRotX -= 75.5f;
+				camRotY -= 55.0f;
+			}
+			else if (m_Camera->GetPosition().x > 130.0f && m_Camera->GetPosition().x < 175.0f)
+			{
+				if (m_Camera->GetPosition().z > 400.0f)
+				{
+					camRotZ -= 0.75f;
+				}
+				else if (m_Camera->GetPosition().z < 200.0f)
+				{
+					camRotZ += 0.75f;
+				}
+			}
+			else if (m_Camera->GetPosition().x > 175.0f && m_Camera->GetPosition().x < 200.0f)
+			{
+				if (m_Camera->GetPosition().z > 350.0f)
+				{
+					camRotZ -= 0.75f;
+				}
+				else if (m_Camera->GetPosition().z < 250.0f)
+				{
+					camRotZ += 0.75f;
+				}
+			}
 
+			if (m_Camera->GetPosition().z > 200.0f && m_Camera->GetPosition().z < 250.0f)
+			{
+				if (m_Camera->GetPosition().x > 170.0f)
+				{
+					camRotX -= 0.75f;
+				}
+			}
+			else if (m_Camera->GetPosition().z > 350.0f && m_Camera->GetPosition().z < 400.0f)
+			{
+				if (m_Camera->GetPosition().x > 170.0f)
+				{
+					camRotX -= 0.75f;
+				}
+			}
 		}
 	}
 	/*else if (mapNum == 1)
@@ -415,7 +515,7 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 
 	}*/
 	
-	m_Camera->SetPosition(camRotX, 45.0f, camRotZ);
+	m_Camera->SetPosition(camRotX, camRotY, camRotZ);
 
 	if ((m_Camera->GetPosition().x >= -1.0f && m_Camera->GetPosition().x <= 1.0f) &&
 		(m_Camera->GetPosition().z >= 4.5f && m_Camera->GetPosition().z <= 5.5f))
