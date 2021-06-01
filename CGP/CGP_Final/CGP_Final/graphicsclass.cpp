@@ -13,6 +13,9 @@ GraphicsClass::GraphicsClass()
 	for (int i = 0; i < 2; i++)
 		m_Model[i] = 0;
 
+	mapNum = 0;
+	inCorridor = 0;
+
 	getCard = false;
 
 	camRotX = 0.0f;
@@ -385,20 +388,46 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 	camRotZ += m_Camera->GetMoveZ() * 1.5f * cos(m_Camera->GetRotY());
 	camRotZ += m_Camera->GetMoveX() * 1.5f * -sin(m_Camera->GetRotY());
 
-	m_Camera->SetPosition(camRotX, 100.0f, camRotZ);
-
-	if ((m_Camera->GetPosition().x >= -1.0f && m_Camera->GetPosition().x <= 1.0f) && (m_Camera->GetPosition().z >= 4.5f && m_Camera->GetPosition().z <= 5.5f))
+	if (mapNum == 0)
 	{
-		getCard = true;
+		if (inCorridor == 0)
+		{
+			if (m_Camera->GetPosition().x > 55.0f)
+				camRotX -= 0.75f;
+			else if (m_Camera->GetPosition().x < -55.0f)
+				camRotX += 0.75f;
+			if (m_Camera->GetPosition().z > 675.0f)
+				camRotZ -= 0.75f;
+			else if (m_Camera->GetPosition().z < -675.0f)
+				camRotZ += 0.75f;
+		}
+		else if (inCorridor == 1)
+		{
+
+		}
+		else if (inCorridor == 2)
+		{
+
+		}
 	}
+	/*else if (mapNum == 1)
+	{
+
+	}*/
 	
+	m_Camera->SetPosition(camRotX, 45.0f, camRotZ);
+
+	if ((m_Camera->GetPosition().x >= -1.0f && m_Camera->GetPosition().x <= 1.0f) &&
+		(m_Camera->GetPosition().z >= 4.5f && m_Camera->GetPosition().z <= 5.5f))
+		getCard = true;
+
 	return true;
 }
 
 bool GraphicsClass::Render(float rotation)
 {
-	// worldMatrix[0-8] = CardKey, worldMatrix[9] = Map / Ui
-	D3DXMATRIX worldMatrix[10], viewMatrix, projectionMatrix, orthoMatrix;
+	// worldMatrix[0-8] = CardKey, worldMatrix[9] = Map, worldMatrix[10] = Ui
+	D3DXMATRIX worldMatrix[11], viewMatrix, projectionMatrix, orthoMatrix;
 	bool result;
 	D3DXVECTOR3 cameraPosition;
 
@@ -411,7 +440,7 @@ bool GraphicsClass::Render(float rotation)
 
 	// Get the world, view, and projection matrices from the camera and d3d objects.
 	m_Camera->GetViewMatrix(viewMatrix);
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 11; i++)
 		m_D3D->GetWorldMatrix(worldMatrix[i]);
 	m_D3D->GetProjectionMatrix(projectionMatrix);
 	m_D3D->GetOrthoMatrix(orthoMatrix);
@@ -422,7 +451,7 @@ bool GraphicsClass::Render(float rotation)
 	cameraPosition = m_Camera->GetPosition();
 
 	// Translate the sky dome to be centered around the camera position.
-	D3DXMatrixTranslation(&worldMatrix[9], cameraPosition.x, cameraPosition.y, cameraPosition.z);
+	D3DXMatrixTranslation(&worldMatrix[10], cameraPosition.x, cameraPosition.y, cameraPosition.z);
 
 	// Turn off back face culling.
 	m_D3D->TurnOffCulling();
@@ -431,12 +460,12 @@ bool GraphicsClass::Render(float rotation)
 	m_D3D->TurnZBufferOff();
 
 	m_SkyDome->Render(m_D3D->GetDeviceContext());
-	m_SkyDomeShader->Render(m_D3D->GetDeviceContext(), m_SkyDome->GetIndexCount(), worldMatrix[9], viewMatrix, projectionMatrix,
+	m_SkyDomeShader->Render(m_D3D->GetDeviceContext(), m_SkyDome->GetIndexCount(), worldMatrix[10], viewMatrix, projectionMatrix,
 		m_SkyDome->GetApexColor(), m_SkyDome->GetCenterColor());
 
 	m_D3D->TurnOnCulling();
 
-	m_D3D->GetWorldMatrix(worldMatrix[9]);
+	m_D3D->GetWorldMatrix(worldMatrix[10]);
 
 	// Put the bitmap vertex and index buffers on the graphics pipeline to prepare them for drawing.
 	result = m_Bitmap->Render(m_D3D->GetDeviceContext(), 200, 200);
@@ -446,7 +475,7 @@ bool GraphicsClass::Render(float rotation)
 	}
 
 	// Render the bitmap with the texture shader.
-	result = m_TextureShader->Render(m_D3D->GetDeviceContext(), m_Bitmap->GetIndexCount(), worldMatrix[6], viewMatrix, orthoMatrix, m_Bitmap->GetTexture());
+	result = m_TextureShader->Render(m_D3D->GetDeviceContext(), m_Bitmap->GetIndexCount(), worldMatrix[10], viewMatrix, orthoMatrix, m_Bitmap->GetTexture());
 	if (!result)
 	{
 		return false;
@@ -457,7 +486,7 @@ bool GraphicsClass::Render(float rotation)
 	m_D3D->TurnOnAlphaBlending();
 
 	// Render the text strings.
-	result = m_Text->Render(m_D3D->GetDeviceContext(), worldMatrix[6], orthoMatrix);
+	result = m_Text->Render(m_D3D->GetDeviceContext(), worldMatrix[10], orthoMatrix);
 	if (!result)
 	{
 		return false;
@@ -478,7 +507,7 @@ bool GraphicsClass::Render(float rotation)
 
 	D3DXMatrixScaling(&worldMatrix[6], 0.5f, 0.5f, 0.5f);
 	D3DXMatrixRotationY(&worldMatrix[7], 1.75f);
-	D3DXMatrixTranslation(&worldMatrix[8], 0.0f, 100.0f, 5.0f);
+	D3DXMatrixTranslation(&worldMatrix[8], 0.0f, 45.0f, 5.0f);
 
 	//m_D3D->SetWorldMatrix(worldMatrix1);
 
@@ -501,6 +530,8 @@ bool GraphicsClass::Render(float rotation)
 	{
 		return false;
 	}
+
+	D3DXMatrixScaling(&worldMatrix[9], 0.3f, 0.3f, 0.5f);
 
 	// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
 	// Map1-3

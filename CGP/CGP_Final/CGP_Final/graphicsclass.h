@@ -57,6 +57,9 @@ public:
 
 	float lX, lY;
 
+	int mapNum;
+	int inCorridor;
+
 	bool getCard;
 
 private:

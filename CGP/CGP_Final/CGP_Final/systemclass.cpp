@@ -218,8 +218,14 @@ bool SystemClass::Frame()
 		return false;
 	}
 
+	/*if ((m_Graphics->GetCamera()->GetPosition().x < 10 &&
+		m_Graphics->GetCamera()->GetPosition().x > -10) &&
+		(m_Graphics->GetCamera()->GetPosition().z < 10 &&
+		m_Graphics->GetCamera()->GetPosition().z >= -10))
+	{
+		m_Graphics->GetCamera()->CameraMove(m_Input->GetMoveState());
+	}*/
 	m_Graphics->GetCamera()->CameraMove(m_Input->GetMoveState());
-	//m_Graphics->GetCamera()->CameraRotation(m_Input->GetMoveState());
 
 	// Get the location of the mouse from the input object,
 	m_Input->GetMouseLocation(mouseX, mouseY);
