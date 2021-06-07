@@ -168,11 +168,11 @@ bool SystemClass::Frame()
 	// 직접적으로 .ps파일을 고치는 방법을 모르겠어서 밝기가 다른 두 .ps파일을 만들어 스왑하는 형식으로 해봤습니다.
 	if (m_Input->IsKeyDown('1'))
 	{
-		m_Graphics->GetColorShader()->Bright(m_Graphics->GetD3D()->GetDevice(), L"../CGP_HW1/color.ps");
+		m_Graphics->GetColorShader()->Bright(m_Graphics->GetD3D()->GetDevice(), L"./color.ps");
 	}
 	if (m_Input->IsKeyDown('2'))
 	{
-		m_Graphics->GetColorShader()->Bright(m_Graphics->GetD3D()->GetDevice(), L"../CGP_HW1/color1.ps");
+		m_Graphics->GetColorShader()->Bright(m_Graphics->GetD3D()->GetDevice(), L"./color1.ps");
 	}
 
 	// Do the frame processing for the graphics object.

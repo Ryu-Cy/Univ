@@ -63,7 +63,9 @@ public:
 private:
 	D3DClass* m_D3D;
 	CameraClass* m_Camera;
-	ModelClass* m_Model[4];
+	ModelClass* m_Card;
+	ModelClass* m_Map[3];
+	ModelClass* m_Door[2];
 	LightShaderClass* m_LightShader;
 	LightClass* m_Light;
 

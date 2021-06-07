@@ -10,8 +10,11 @@ GraphicsClass::GraphicsClass()
 	m_Camera = 0;
 	m_LightShader = 0;
 	m_Light = 0;
+	m_Card = 0;
+	for (int i = 0; i < 3; i++)
+		m_Map[i] = 0;
 	for (int i = 0; i < 2; i++)
-		m_Model[i] = 0;
+		m_Door[i] = 0;
 
 	mapNum = 0;
 	inCorridor = 0;
@@ -75,15 +78,15 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_Camera->SetLookAt(0.0f, 0.0f, 0.1f);
 
 	// Create the model[CardKey] object.
-	m_Model[0] = new ModelClass;
-	if (!m_Model[0])
+	m_Card = new ModelClass;
+	if (!m_Card)
 	{
 		return false;
 	}
 
 	// Initialize the model[CardKey] object.
-	result = m_Model[0]->Initialize(m_D3D->GetDevice(), "../CGP_Final/data/KeyCard/Chip_key_2/Material/key.obj", L"../CGP_Final/data/KeyCard/Chip_key_2/Texturizer/metal_1.jpg", 
-		L"../CGP_Final/data/KeyCard/Chip_key_2/Texturizer/stars-1920x1200-galaxy-4k-6362.jpg", L"../CGP_Final/data/KeyCard/Chip_key_2/Texturizer/Blury.jpg", 
+	result = m_Card->Initialize(m_D3D->GetDevice(), "../CGP_Final/data/KeyCard/Chip_key_2/Material/key.obj", L"../CGP_Final/data/KeyCard/Chip_key_2/Texturizer/metal_1.jpg",
+		L"../CGP_Final/data/stars.jpg", L"../CGP_Final/data/KeyCard/Chip_key_2/Texturizer/Blury.jpg",
 		L"../CGP_Final/data/KeyCard/Chip_key_2/Texturizer/Lake.jpg");
 
 	if (!result)
@@ -93,15 +96,14 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	// Create the model[Map1] object.
-	m_Model[1] = new ModelClass;
-	if (!m_Model[1])
+	m_Map[0] = new ModelClass;
+	if (!m_Map[0])
 	{
 		return false;
 	}
 
 	// Initialize the model[Map1] object.
-	result = m_Model[1]->Initialize(m_D3D->GetDevice(), "../CGP_Final/data/Map/map1.obj", L"../CGP_Final/data/Map/map11.jpg",
-		L"../CGP_Final/data/Map/map12.jpg", L"../CGP_Final/data/Map/map13.jpg", L"../CGP_Final/data/Map/map14.jpg");
+	result = m_Map[0]->Initialize(m_D3D->GetDevice(), "../CGP_Final/data/Map/map_01.obj", L"../CGP_Final/data/Map/map11.jpg", L"../CGP_Final/data/Map/map12.jpg", L"../CGP_Final/data/Map/map13.jpg", L"../CGP_Final/data/Map/map14.jpg");
 
 	if (!result)
 	{
@@ -110,15 +112,14 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	// Create the model[Map2] object.
-	m_Model[2] = new ModelClass;
-	if (!m_Model[2])
+	m_Map[1] = new ModelClass;
+	if (!m_Map[1])
 	{
 		return false;
 	}
 
 	// Initialize the model[Map2] object.
-	result = m_Model[2]->Initialize(m_D3D->GetDevice(), "../CGP_Final/data/Map/map2.obj", L"../CGP_Final/data/Map/map21.jpg",
-		L"../CGP_Final/data/Map/map22.jpg", L"../CGP_Final/data/Map/map23.jpg", L"../CGP_Final/data/Map/map23.jpg");
+	result = m_Map[1]->Initialize(m_D3D->GetDevice(), "../CGP_Final/data/Map/map2.obj", L"../CGP_Final/data/Map/map21.jpg", L"../CGP_Final/data/Map/map22.jpg", L"../CGP_Final/data/Map/map23.jpg", L"../CGP_Final/data/Map/map23.jpg");
 
 	if (!result)
 	{
@@ -127,19 +128,35 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	// Create the model[Map3] object.
-	m_Model[3] = new ModelClass;
-	if (!m_Model[3])
+	m_Map[2] = new ModelClass;
+	if (!m_Map[2])
 	{
 		return false;
 	}
 
 	// Initialize the model[Map3] object.
-	result = m_Model[3]->Initialize(m_D3D->GetDevice(), "../CGP_Final/data/Map/map3.obj", L"../CGP_Final/data/Map/map31.jpg", 
-		L"../CGP_Final/data/Map/map32.jpg", L"../CGP_Final/data/Map/map33.jpg", L"../CGP_Final/data/Map/map34.jpg");
+	result = m_Map[2]->Initialize(m_D3D->GetDevice(), "../CGP_Final/data/Map/map3.obj", L"../CGP_Final/data/Map/map31.jpg", L"../CGP_Final/data/Map/map32.jpg", L"../CGP_Final/data/Map/map33.jpg", L"../CGP_Final/data/Map/map34.jpg");
 
 	if (!result)
 	{
 		MessageBox(hwnd, L"Could not initialize the model3 object.", L"Error", MB_OK);
+		return false;
+	}
+
+
+	for (int i = 0; i < 2; i++)
+	{
+		m_Door[i] = new ModelClass;
+		if (!m_Door[i])
+		{
+			return false;
+		}
+		result = m_Door[i]->Initialize(m_D3D->GetDevice(), "../CGP_Final/data/Map/door.obj", L"../CGP_Final/data/Map/map21.jpg", L"../CGP_Final/data/Map/map22.jpg", L"../CGP_Final/data/Map/map23.jpg", L"../CGP_Final/data/Map/map23.jpg");
+	}
+
+	if (!result)
+	{
+		MessageBox(hwnd, L"Could not initialize the door object.", L"Error", MB_OK);
 		return false;
 	}
 
@@ -289,14 +306,33 @@ void GraphicsClass::Shutdown()
 		m_LightShader = 0;
 	}
 
-	// Release the model object.
-	for (int i = 0; i < 4; i++)
+	// Release the card object.
+	if (m_Card)
 	{
-		if (m_Model[i])
+		m_Card->Shutdown();
+		delete m_Card;
+		m_Card = 0;
+	}
+
+	// Release the map object.
+	for (int i = 0; i < 3; i++)
+	{
+		if (m_Map[i])
 		{
-			m_Model[i]->Shutdown();
-			delete m_Model[i];
-			m_Model[i] = 0;
+			m_Map[i]->Shutdown();
+			delete m_Map[i];
+			m_Map[i] = 0;
+		}
+	}
+
+	// Release the door object.
+	for (int i = 0; i < 2; i++)
+	{
+		if (m_Door[i])
+		{
+			m_Door[i]->Shutdown();
+			delete m_Door[i];
+			m_Door[i] = 0;
 		}
 	}
 
@@ -527,7 +563,14 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 bool GraphicsClass::Render(float rotation)
 {
 	// worldMatrix[0-8] = CardKey, worldMatrix[9] = Map, worldMatrix[10] = Ui
-	D3DXMATRIX worldMatrix[11], viewMatrix, projectionMatrix, orthoMatrix;
+	D3DXMATRIX worldMatrix[11], viewMatrix, projectionMatrix, projectionMatrix1, orthoMatrix;
+	D3DXMATRIX doorMoveMatrix[10];
+	D3DXMATRIX doorScalingMatrix;
+	D3DXMATRIX doorMatrix[10];
+	D3DXMATRIX doorRotateMatrix[3];
+	D3DXMATRIX Map2MoveMatrix;
+	D3DXMATRIX Map2Scaling;
+	D3DXMATRIX Map2Matrix;
 	bool result;
 	D3DXVECTOR3 cameraPosition;
 
@@ -543,6 +586,10 @@ bool GraphicsClass::Render(float rotation)
 	for (int i = 0; i < 11; i++)
 		m_D3D->GetWorldMatrix(worldMatrix[i]);
 	m_D3D->GetProjectionMatrix(projectionMatrix);
+	m_D3D->GetProjectionMatrix(projectionMatrix1);
+	for (int i = 0; i < 10; i++)
+		m_D3D->GetWorldMatrix(doorMoveMatrix[i]);
+	m_D3D->GetWorldMatrix(Map2Matrix);
 	m_D3D->GetOrthoMatrix(orthoMatrix);
 
 	//m_D3D->SetWorldMatrix(worldMatrix);
@@ -563,16 +610,268 @@ bool GraphicsClass::Render(float rotation)
 	m_SkyDomeShader->Render(m_D3D->GetDeviceContext(), m_SkyDome->GetIndexCount(), worldMatrix[10], viewMatrix, projectionMatrix,
 		m_SkyDome->GetApexColor(), m_SkyDome->GetCenterColor());
 
+	// Turn on back face culling.
 	m_D3D->TurnOnCulling();
 
-	m_D3D->GetWorldMatrix(worldMatrix[10]);
+	// Turn the Z buffer back on now that all 2D rendering has completed.
+	m_D3D->TurnZBufferOn();
 
-	// Put the bitmap vertex and index buffers on the graphics pipeline to prepare them for drawing.
-	result = m_Bitmap->Render(m_D3D->GetDeviceContext(), 200, 200);
+
+	// Rotate the world matrix by the rotation value so that the triangle will spin.
+	D3DXMatrixScaling(&worldMatrix[1], 0.2f, 0.15f, 0.2f);
+	D3DXMatrixTranslation(&worldMatrix[2], 0.8f, -0.5f, 3.5f);
+	D3DXMatrixRotationX(&worldMatrix[3], lY * 0.03f * 0.0174532925f);
+	D3DXMatrixRotationY(&worldMatrix[4], lX * 0.03f * 0.0174532925f);
+	D3DXMatrixTranslation(&worldMatrix[5], m_Camera->GetPosition().x, m_Camera->GetPosition().y, m_Camera->GetPosition().z);
+
+	D3DXMatrixScaling(&worldMatrix[6], 0.5f, 0.5f, 0.5f);
+	D3DXMatrixRotationY(&worldMatrix[7], 1.75f);
+	D3DXMatrixTranslation(&worldMatrix[8], 0.0f, 45.0f, 5.0f);
+
+	//m_D3D->SetWorldMatrix(worldMatrix1);
+
+	// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
+	// CardKey
+	m_Card->Render(m_D3D->GetDeviceContext());
+
+	// Render the model using the light shader.
+	if (getCard)
+		for (int i = 1; i < 6; i++)
+			worldMatrix[0] *= worldMatrix[i];
+	else
+		for (int i = 6; i < 9; i++)
+			worldMatrix[0] *= worldMatrix[i];
+
+	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Card->GetIndexCount(), worldMatrix[0], viewMatrix, projectionMatrix,
+		*m_Card->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
+		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
 	if (!result)
 	{
 		return false;
 	}
+
+	//벽에 있는거
+	D3DXMatrixTranslation(&doorMoveMatrix[0], -600.0f, 260.0f, 585.0f); // 중앙위
+
+	D3DXMatrixTranslation(&doorMoveMatrix[1], 600.0f, 260.0f, 585.0f);  // 우상단
+
+	D3DXMatrixTranslation(&doorMoveMatrix[2], -700.0f, 260.0f, 585.0f); // 중앙위
+
+	D3DXMatrixTranslation(&doorMoveMatrix[3], 600.0f, 260.0f, -585.0f);  // 우하단
+
+	D3DXMatrixTranslation(&doorMoveMatrix[4], -1900.0f, 260.0f, -585.0f);  // 좌하단
+
+	D3DXMatrixTranslation(&doorMoveMatrix[5], -1900.0f, 260.0f, 585.0f);  // 좌하단
+
+	//위아래 있는거
+
+	D3DXMatrixTranslation(&doorMoveMatrix[6], 0.0f, 130.0f, -1400.0f);
+	D3DXMatrixTranslation(&doorMoveMatrix[7], 0.0f, 130.0f, 1400.0f);
+
+	D3DXMatrixTranslation(&doorMoveMatrix[8], -1300.0f, 130.0f, -1400.0f);
+	D3DXMatrixTranslation(&doorMoveMatrix[9], -1300.0f, 130.0f, 1400.0f);
+
+	//문돌리기
+	D3DXMatrixRotationY(&doorRotateMatrix[0], 3.141592f); // 180도 회전
+	D3DXMatrixRotationY(&doorRotateMatrix[1], 1.5708f); // 90도 회전
+	D3DXMatrixRotationY(&doorRotateMatrix[2], 4.71239f); // 270도 회전
+	//맵 2 이동 및 스케일링
+
+	D3DXMatrixTranslation(&Map2MoveMatrix, -1300.0f, 0.0f, 0.0f);
+	D3DXMatrixScaling(&Map2Scaling, 0.3f, 0.3f, 0.3f);
+	D3DXMatrixMultiply(&Map2Matrix, &Map2MoveMatrix, &Map2Scaling);
+
+
+	//맵 크기 줄이기
+
+	D3DXMatrixScaling(&worldMatrix[9], 0.3f, 0.3f, 0.3f);
+	D3DXMatrixScaling(&doorScalingMatrix, 0.3f, 0.3f, 0.3f);
+
+	//m_D3D->SetWorldMatrix(worldMatrix1);
+	// 문 배열 곱하기
+
+	D3DXMatrixMultiply(&doorMatrix[0], &doorMoveMatrix[0], &doorScalingMatrix);
+	D3DXMatrixMultiply(&doorMatrix[1], &doorMoveMatrix[1], &doorScalingMatrix);
+	D3DXMatrixMultiply(&doorMatrix[2], &doorMoveMatrix[2], &doorScalingMatrix);
+	D3DXMatrixMultiply(&doorMatrix[3], &doorMoveMatrix[3], &doorScalingMatrix);
+	D3DXMatrixMultiply(&doorMatrix[4], &doorMoveMatrix[4], &doorScalingMatrix);
+	D3DXMatrixMultiply(&doorMatrix[5], &doorMoveMatrix[5], &doorScalingMatrix);
+	D3DXMatrixMultiply(&doorMatrix[6], &doorMoveMatrix[6], &doorScalingMatrix);
+	D3DXMatrixMultiply(&doorMatrix[7], &doorMoveMatrix[7], &doorScalingMatrix);
+	D3DXMatrixMultiply(&doorMatrix[8], &doorMoveMatrix[8], &doorScalingMatrix);
+	D3DXMatrixMultiply(&doorMatrix[9], &doorMoveMatrix[9], &doorScalingMatrix);
+
+	// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
+	// Map1-3
+	m_Map[0]->Render(m_D3D->GetDeviceContext());
+
+	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Map[0]->GetIndexCount(), worldMatrix[9], viewMatrix, projectionMatrix1,
+		*m_Map[0]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
+		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+	if (!result)
+	{
+		return false;
+	}
+
+	m_Map[1]->Render(m_D3D->GetDeviceContext());
+
+	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Map[1]->GetIndexCount(), worldMatrix[9], viewMatrix, projectionMatrix1,
+		*m_Map[1]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
+		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+	if (!result)
+	{
+		return false;
+	}
+
+	m_Map[2]->Render(m_D3D->GetDeviceContext());
+
+	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Map[2]->GetIndexCount(), worldMatrix[9], viewMatrix, projectionMatrix1,
+		*m_Map[2]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
+		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+	if (!result)
+	{
+		return false;
+	}
+	// 맵2 렌더링
+
+	m_Map[0]->Render(m_D3D->GetDeviceContext());
+
+	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Map[0]->GetIndexCount(), Map2Matrix, viewMatrix, projectionMatrix1,
+		*m_Map[0]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
+		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+	if (!result)
+	{
+		return false;
+	}
+
+	m_Map[1]->Render(m_D3D->GetDeviceContext());
+
+	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Map[1]->GetIndexCount(), Map2Matrix, viewMatrix, projectionMatrix1,
+		*m_Map[1]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
+		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+	if (!result)
+	{
+		return false;
+	}
+
+	m_Map[2]->Render(m_D3D->GetDeviceContext());
+
+	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Map[2]->GetIndexCount(), Map2Matrix, viewMatrix, projectionMatrix1,
+		*m_Map[2]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
+		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+	if (!result)
+	{
+		return false;
+	}
+
+
+	m_Door[0]->Render(m_D3D->GetDeviceContext());
+
+	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Door[0]->GetIndexCount(), doorMatrix[0], viewMatrix, projectionMatrix1,
+		*m_Door[0]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
+		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+	if (!result)
+	{
+		return false;
+	}
+
+	m_Door[0]->Render(m_D3D->GetDeviceContext());
+
+	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Door[0]->GetIndexCount(), doorMatrix[4], viewMatrix, projectionMatrix1,
+		*m_Door[0]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
+		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+	if (!result)
+	{
+		return false;
+	}
+
+	m_Door[0]->Render(m_D3D->GetDeviceContext());
+
+	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Door[0]->GetIndexCount(), doorMatrix[5], viewMatrix, projectionMatrix1,
+		*m_Door[0]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
+		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+	if (!result)
+	{
+		return false;
+	}
+
+	m_Door[0]->Render(m_D3D->GetDeviceContext());
+
+	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Door[0]->GetIndexCount(), doorRotateMatrix[0] * doorMatrix[3], viewMatrix, projectionMatrix1,
+		*m_Door[0]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
+		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+	if (!result)
+	{
+		return false;
+	}
+
+	m_Door[0]->Render(m_D3D->GetDeviceContext());
+
+	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Door[0]->GetIndexCount(), doorRotateMatrix[0] * doorMatrix[1], viewMatrix, projectionMatrix1,
+		*m_Door[0]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
+		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+	if (!result)
+	{
+		return false;
+	}
+
+
+	m_Door[0]->Render(m_D3D->GetDeviceContext());
+
+	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Door[0]->GetIndexCount(), doorRotateMatrix[0] * doorMatrix[2], viewMatrix, projectionMatrix1,
+		*m_Door[0]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
+		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+	if (!result)
+	{
+		return false;
+	}
+
+
+	// 위아래 있는거
+
+	m_Door[0]->Render(m_D3D->GetDeviceContext());
+
+	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Door[0]->GetIndexCount(), doorRotateMatrix[2] * doorMatrix[6], viewMatrix, projectionMatrix1,
+		*m_Door[0]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
+		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+	if (!result)
+	{
+		return false;
+	}
+
+	m_Door[0]->Render(m_D3D->GetDeviceContext());
+
+	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Door[0]->GetIndexCount(), doorRotateMatrix[1] * doorMatrix[7], viewMatrix, projectionMatrix1,
+		*m_Door[0]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
+		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+	if (!result)
+	{
+		return false;
+	}
+
+	m_Door[0]->Render(m_D3D->GetDeviceContext());
+
+	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Door[0]->GetIndexCount(), doorRotateMatrix[2] * doorMatrix[8], viewMatrix, projectionMatrix1,
+		*m_Door[0]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
+		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+	if (!result)
+	{
+		return false;
+	}
+
+	m_Door[0]->Render(m_D3D->GetDeviceContext());
+
+	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Door[0]->GetIndexCount(), doorRotateMatrix[1] * doorMatrix[9], viewMatrix, projectionMatrix1,
+		*m_Door[0]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
+		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+	if (!result)
+	{
+		return false;
+	}
+
+	m_D3D->TurnZBufferOff();
+
+	m_D3D->GetWorldMatrix(worldMatrix[10]);
 
 	// Render the bitmap with the texture shader.
 	result = m_TextureShader->Render(m_D3D->GetDeviceContext(), m_Bitmap->GetIndexCount(), worldMatrix[10], viewMatrix, orthoMatrix, m_Bitmap->GetTexture());
@@ -597,73 +896,6 @@ bool GraphicsClass::Render(float rotation)
 
 	// Turn the Z buffer back on now that all 2D rendering has completed.
 	m_D3D->TurnZBufferOn();
-
-	// Rotate the world matrix by the rotation value so that the triangle will spin.
-	D3DXMatrixScaling(&worldMatrix[1], 0.2f, 0.15f, 0.2f);
-	D3DXMatrixTranslation(&worldMatrix[2], 0.8f, -0.5f, 3.5f);
-	D3DXMatrixRotationX(&worldMatrix[3], lY * 0.03f * 0.0174532925f);
-	D3DXMatrixRotationY(&worldMatrix[4], lX * 0.03f * 0.0174532925f);
-	D3DXMatrixTranslation(&worldMatrix[5], m_Camera->GetPosition().x, m_Camera->GetPosition().y, m_Camera->GetPosition().z);
-
-	D3DXMatrixScaling(&worldMatrix[6], 0.5f, 0.5f, 0.5f);
-	D3DXMatrixRotationY(&worldMatrix[7], 1.75f);
-	D3DXMatrixTranslation(&worldMatrix[8], 0.0f, 45.0f, 5.0f);
-
-	//m_D3D->SetWorldMatrix(worldMatrix1);
-
-	// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
-	// CardKey
-	m_Model[0]->Render(m_D3D->GetDeviceContext());
-
-	// Render the model using the light shader.
-	if (getCard)
-		for (int i = 1; i < 6; i++)
-			worldMatrix[0] *= worldMatrix[i];
-	else
-		for (int i = 6; i < 9; i++)
-			worldMatrix[0] *= worldMatrix[i];
-
-	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model[0]->GetIndexCount(), worldMatrix[0], viewMatrix, projectionMatrix,
-		*m_Model[0]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
-		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
-	if (!result)
-	{
-		return false;
-	}
-
-	D3DXMatrixScaling(&worldMatrix[9], 0.3f, 0.3f, 0.5f);
-
-	// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
-	// Map1-3
-	m_Model[1]->Render(m_D3D->GetDeviceContext());
-
-	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model[1]->GetIndexCount(), worldMatrix[9], viewMatrix, projectionMatrix,
-		*m_Model[1]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
-		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
-	if (!result)
-	{
-		return false;
-	}
-
-	m_Model[2]->Render(m_D3D->GetDeviceContext());
-
-	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model[2]->GetIndexCount(), worldMatrix[9], viewMatrix, projectionMatrix,
-		*m_Model[2]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
-		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
-	if (!result)
-	{
-		return false;
-	}
-
-	m_Model[3]->Render(m_D3D->GetDeviceContext());
-
-	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Model[3]->GetIndexCount(), worldMatrix[9], viewMatrix, projectionMatrix,
-		*m_Model[3]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
-		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
-	if (!result)
-	{
-		return false;
-	}
 
 	// Present the rendered scene to the screen.
 	m_D3D->EndScene();
