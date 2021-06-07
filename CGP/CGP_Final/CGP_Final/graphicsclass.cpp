@@ -433,22 +433,36 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 				camRotX -= 0.75f;
 			else if (m_Camera->GetPosition().x < -55.0f)
 				camRotX += 0.75f;
-			if (m_Camera->GetPosition().z > 675.0f)
+			if (m_Camera->GetPosition().z > 400.0f)
 				camRotZ -= 0.75f;
-			else if (m_Camera->GetPosition().z < -675.0f)
+			else if (m_Camera->GetPosition().z < -400.0f)
 				camRotZ += 0.75f;
 
 			if (m_Camera->GetPosition().x <= -55.0f &&
-				(m_Camera->GetPosition().z < 425.0f && m_Camera->GetPosition().z > 175.0f))
+				(m_Camera->GetPosition().z < 235.0f && m_Camera->GetPosition().z > 115.0f))	// 475 -> 235, 175 -> 115
 			{
 				inCorridor = 1;
 				camRotX -= 75.5f;
 				camRotY += 55.0f;
 			}
 			else if (m_Camera->GetPosition().x >= 55.0f &&
-				(m_Camera->GetPosition().z < 425.0f && m_Camera->GetPosition().z > 175.0f))
+				(m_Camera->GetPosition().z < 235.0f && m_Camera->GetPosition().z > 115.0f))
 			{
 				inCorridor = 2;
+				camRotX += 75.5f;
+				camRotY += 55.0f;
+			}
+			else if (m_Camera->GetPosition().x <= -55.0f &&
+				(m_Camera->GetPosition().z > -235.0f && m_Camera->GetPosition().z < -115.0f))
+			{
+				inCorridor = 3;
+				camRotX -= 75.5f;
+				camRotY += 55.0f;
+			}
+			else if (m_Camera->GetPosition().x >= 55.0f &&
+				(m_Camera->GetPosition().z > -235.0f && m_Camera->GetPosition().z < -115.0f))
+			{
+				inCorridor = 4;
 				camRotX += 75.5f;
 				camRotY += 55.0f;
 			}
@@ -461,30 +475,23 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 				camRotX += 75.5f;
 				camRotY -= 55.0f;
 			}
-			else if (m_Camera->GetPosition().x < -130.0f && m_Camera->GetPosition().x > -175.0f)
+			else if (m_Camera->GetPosition().x < -130.0f && m_Camera->GetPosition().x > -155.0f)
 			{
-				if (m_Camera->GetPosition().z > 400.0f)
+				if (m_Camera->GetPosition().z > 225.0f)
 				{
 					camRotZ -= 0.75f;
 				}
-				else if (m_Camera->GetPosition().z < 200.0f)
+				else if (m_Camera->GetPosition().z < 125.0f)
 				{
 					camRotZ += 0.75f;
 				}
 			}
-			else if (m_Camera->GetPosition().x < -175.0f && m_Camera->GetPosition().x > -200.0f)
+			else if (m_Camera->GetPosition().x < -155.0f)
 			{
-				if (m_Camera->GetPosition().z > 350.0f)
-				{
-					camRotZ -= 0.75f;
-				}
-				else if (m_Camera->GetPosition().z < 250.0f)
-				{
-					camRotZ += 0.75f;
-				}
+				camRotX += 0.75f;
 			}
 
-			if (m_Camera->GetPosition().z > 200.0f && m_Camera->GetPosition().z < 250.0f)
+			/*if (m_Camera->GetPosition().z > 200.0f && m_Camera->GetPosition().z < 250.0f)
 			{
 				if (m_Camera->GetPosition().x < -170.0f)
 				{
@@ -497,7 +504,7 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 				{
 					camRotX += 0.75f;
 				}
-			}
+			}*/
 		}
 		else if (inCorridor == 2)
 		{
@@ -507,30 +514,23 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 				camRotX -= 75.5f;
 				camRotY -= 55.0f;
 			}
-			else if (m_Camera->GetPosition().x > 130.0f && m_Camera->GetPosition().x < 175.0f)
+			else if (m_Camera->GetPosition().x > 130.0f && m_Camera->GetPosition().x < 155.0f)
 			{
-				if (m_Camera->GetPosition().z > 400.0f)
+				if (m_Camera->GetPosition().z > 225.0f)
 				{
 					camRotZ -= 0.75f;
 				}
-				else if (m_Camera->GetPosition().z < 200.0f)
+				else if (m_Camera->GetPosition().z < 125.0f)
 				{
 					camRotZ += 0.75f;
 				}
 			}
-			else if (m_Camera->GetPosition().x > 175.0f && m_Camera->GetPosition().x < 200.0f)
+			else if (m_Camera->GetPosition().x > 155.0f)
 			{
-				if (m_Camera->GetPosition().z > 350.0f)
-				{
-					camRotZ -= 0.75f;
-				}
-				else if (m_Camera->GetPosition().z < 250.0f)
-				{
-					camRotZ += 0.75f;
-				}
+				camRotX -= 0.75f;
 			}
 
-			if (m_Camera->GetPosition().z > 200.0f && m_Camera->GetPosition().z < 250.0f)
+			/*if (m_Camera->GetPosition().z > 200.0f && m_Camera->GetPosition().z < 250.0f)
 			{
 				if (m_Camera->GetPosition().x > 170.0f)
 				{
@@ -543,6 +543,65 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 				{
 					camRotX -= 0.75f;
 				}
+			}*/
+		}
+		else if (inCorridor == 3)
+		{
+			if (m_Camera->GetPosition().x > -130.0f)
+			{
+				inCorridor = 0;
+				camRotX += 75.5f;
+				camRotY -= 55.0f;
+			}
+			else if (m_Camera->GetPosition().x < -130.0f && m_Camera->GetPosition().x > -175.0f)
+			{
+				if (m_Camera->GetPosition().z < -225.0f)
+				{
+					camRotZ += 0.75f;
+				}
+				else if (m_Camera->GetPosition().z > -125.0f)
+				{
+					camRotZ -= 0.75f;
+				}
+			}
+
+			if (m_Camera->GetPosition().z < -100.0f && m_Camera->GetPosition().z > -140.0f)
+			{
+				if (m_Camera->GetPosition().x < -165.0f)
+				{
+					camRotX += 0.75f;
+				}
+			}
+			else if (m_Camera->GetPosition().z < -210.0f && m_Camera->GetPosition().z > -240.0f)
+			{
+				if (m_Camera->GetPosition().x < -165.0f)
+				{
+					camRotX += 0.75f;
+				}
+			}
+		}
+		else if (inCorridor == 4)
+		{
+			if (m_Camera->GetPosition().x < 130.0f)
+			{
+				inCorridor = 0;
+				camRotX -= 75.5f;
+				camRotY -= 55.0f;
+			}
+			else if (m_Camera->GetPosition().x > 130.0f && m_Camera->GetPosition().x < 155.0f)
+			{
+				if (m_Camera->GetPosition().z < -225.0f)
+				{
+					camRotZ += 0.75f;
+				}
+				else if (m_Camera->GetPosition().z > -125.0f)
+				{
+					camRotZ -= 0.75f;
+				}
+			}
+			else if (m_Camera->GetPosition().x > 155.0f)
+			{
+				camRotX -= 0.75f;
 			}
 		}
 	}
