@@ -45,8 +45,8 @@ public:
 	bool SetNumOfObject(int, ID3D11DeviceContext*);
 	bool SetNumOfPolygons(int, ID3D11DeviceContext*);
 
-	bool SetNeedCard(bool, ID3D11DeviceContext*);
-	bool SetLocked(bool, ID3D11DeviceContext*);
+	bool SetNeedCard(bool, bool, ID3D11DeviceContext*);
+	bool SetLocked(bool, bool, ID3D11DeviceContext*);
 
 	bool SetScreen(ID3D11DeviceContext*);
 

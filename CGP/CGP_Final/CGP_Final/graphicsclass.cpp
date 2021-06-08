@@ -20,6 +20,8 @@ GraphicsClass::GraphicsClass()
 	inCorridor = 0;
 
 	getCard = false;
+	isInteractDoor = false;
+	isInteractEscape = false;
 
 	num_of_polygons = 0;
 	num_of_objects = 0;
@@ -427,13 +429,13 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 		return false;
 	}
 
-	result = m_Text->SetNeedCard(getCard, m_D3D->GetDeviceContext());
+	result = m_Text->SetNeedCard(getCard, isInteractEscape, m_D3D->GetDeviceContext());
 	if (!result)
 	{
 		return false;
 	}
 
-	result = m_Text->SetLocked(num_of_polygons, m_D3D->GetDeviceContext());
+	result = m_Text->SetLocked(1, isInteractDoor, m_D3D->GetDeviceContext());
 	if (!result)
 	{
 		return false;
@@ -462,6 +464,8 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 	{
 		if (inCorridor == 0)
 		{
+			isInteractEscape = false;
+			isInteractDoor = false;
 			if (m_Camera->GetPosition().x > 55.0f)
 				camRotX -= 0.75f;
 			else if (m_Camera->GetPosition().x < -55.0f)
@@ -499,6 +503,13 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 				camRotX += 75.5f;
 				camRotY += 55.0f;
 			}
+
+			if (m_Camera->GetPosition().z >= 400.0f &&
+				(m_Camera->GetPosition().x > -35.0f && m_Camera->GetPosition().x < 35.0f))
+				isInteractEscape = true;
+			else if (m_Camera->GetPosition().z <= -400.0f &&
+				(m_Camera->GetPosition().x > -35.0f && m_Camera->GetPosition().x < 35.0f))
+				isInteractDoor = true;
 		}
 		else if (inCorridor == 1)
 		{
@@ -510,6 +521,7 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 			}
 			else if (m_Camera->GetPosition().x < -130.0f && m_Camera->GetPosition().x > -155.0f)
 			{
+				isInteractDoor = false;
 				if (m_Camera->GetPosition().z > 225.0f)
 				{
 					camRotZ -= 0.75f;
@@ -521,6 +533,7 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 			}
 			else if (m_Camera->GetPosition().x < -155.0f)
 			{
+				isInteractDoor = true;
 				camRotX += 0.75f;
 			}
 
@@ -549,6 +562,7 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 			}
 			else if (m_Camera->GetPosition().x > 130.0f && m_Camera->GetPosition().x < 155.0f)
 			{
+				isInteractDoor = false;
 				if (m_Camera->GetPosition().z > 225.0f)
 				{
 					camRotZ -= 0.75f;
@@ -560,6 +574,7 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 			}
 			else if (m_Camera->GetPosition().x > 155.0f)
 			{
+				isInteractDoor = true;
 				camRotX -= 0.75f;
 			}
 
@@ -597,7 +612,23 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 					camRotZ -= 0.75f;
 				}
 			}
-
+			else if (m_Camera->GetPosition().x < -175.0f && m_Camera->GetPosition().x > -200.0f)
+			{
+				if (m_Camera->GetPosition().z < -200.0f)
+				{
+					camRotZ += 0.75f;
+				}
+				else if (m_Camera->GetPosition().z > -150.0f)
+				{
+					camRotZ -= 0.75f;
+				}
+			}
+			else if (m_Camera->GetPosition().x < -200.0f)
+			{
+				mapNum = 1;
+				inCorridor = 4;
+			}
+			
 			if (m_Camera->GetPosition().z < -100.0f && m_Camera->GetPosition().z > -140.0f)
 			{
 				if (m_Camera->GetPosition().x < -165.0f)
@@ -623,6 +654,7 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 			}
 			else if (m_Camera->GetPosition().x > 130.0f && m_Camera->GetPosition().x < 155.0f)
 			{
+				isInteractDoor = false;
 				if (m_Camera->GetPosition().z < -225.0f)
 				{
 					camRotZ += 0.75f;
@@ -634,14 +666,221 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 			}
 			else if (m_Camera->GetPosition().x > 155.0f)
 			{
+				isInteractDoor = true;
 				camRotX -= 0.75f;
 			}
 		}
 	}
-	/*else if (mapNum == 1)
+	else if (mapNum == 1)
 	{
+		if (inCorridor == 0)
+		{
+			isInteractDoor = false;
+			if (m_Camera->GetPosition().x > -335.0f)
+				camRotX -= 0.75f;
+			else if (m_Camera->GetPosition().x < -445.0f)
+				camRotX += 0.75f;
+			if (m_Camera->GetPosition().z > 400.0f)
+				camRotZ -= 0.75f;
+			else if (m_Camera->GetPosition().z < -400.0f)
+				camRotZ += 0.75f;
 
-	}*/
+			if (m_Camera->GetPosition().x <= -445.0f &&
+				(m_Camera->GetPosition().z < 235.0f && m_Camera->GetPosition().z > 115.0f))	// 475 -> 235, 175 -> 115
+			{
+				inCorridor = 1;
+				camRotX -= 75.5f;
+				camRotY += 55.0f;
+			}
+			else if (m_Camera->GetPosition().x >= -335.0f &&
+				(m_Camera->GetPosition().z < 235.0f && m_Camera->GetPosition().z > 115.0f))
+			{
+				inCorridor = 2;
+				camRotX += 75.5f;
+				camRotY += 55.0f;
+			}
+			else if (m_Camera->GetPosition().x <= -445.0f &&
+				(m_Camera->GetPosition().z > -235.0f && m_Camera->GetPosition().z < -115.0f))
+			{
+				inCorridor = 3;
+				camRotX -= 75.5f;
+				camRotY += 55.0f;
+			}
+			else if (m_Camera->GetPosition().x >= -335.0f &&
+				(m_Camera->GetPosition().z > -235.0f && m_Camera->GetPosition().z < -115.0f))
+			{
+				inCorridor = 4;
+				camRotX += 75.5f;
+				camRotY += 55.0f;
+			}
+
+			if (m_Camera->GetPosition().z >= 400.0f &&
+				(m_Camera->GetPosition().x > -425.0f && m_Camera->GetPosition().x < -355.0f))
+				isInteractDoor = true;
+			else if (m_Camera->GetPosition().z <= -400.0f &&
+				(m_Camera->GetPosition().x > -425.0f && m_Camera->GetPosition().x < -355.0f))
+				isInteractDoor = true;
+		}
+		else if (inCorridor == 1)
+		{
+			if (m_Camera->GetPosition().x > -520.0f)
+			{
+				inCorridor = 0;
+				camRotX += 75.5f;
+				camRotY -= 55.0f;
+			}
+			else if (m_Camera->GetPosition().x < -520.0f && m_Camera->GetPosition().x > -545.0f)
+			{
+				isInteractDoor = false;
+				if (m_Camera->GetPosition().z > 225.0f)
+				{
+					camRotZ -= 0.75f;
+				}
+				else if (m_Camera->GetPosition().z < 125.0f)
+				{
+					camRotZ += 0.75f;
+				}
+			}
+			else if (m_Camera->GetPosition().x < -545.0f)
+			{
+				isInteractDoor = true;
+				camRotX += 0.75f;
+			}
+
+			/*if (m_Camera->GetPosition().z > 200.0f && m_Camera->GetPosition().z < 250.0f)
+			{
+				if (m_Camera->GetPosition().x < -170.0f)
+				{
+					camRotX += 0.75f;
+				}
+			}
+			else if (m_Camera->GetPosition().z > 350.0f && m_Camera->GetPosition().z < 400.0f)
+			{
+				if (m_Camera->GetPosition().x < -170.0f)
+				{
+					camRotX += 0.75f;
+				}
+			}*/
+		}
+		else if (inCorridor == 2)
+		{
+			if (m_Camera->GetPosition().x < -260.0f)
+			{
+				inCorridor = 0;
+				camRotX -= 75.5f;
+				camRotY -= 55.0f;
+			}
+			else if (m_Camera->GetPosition().x > -260.0f && m_Camera->GetPosition().x < -235.0f)
+			{
+				isInteractDoor = false;
+				if (m_Camera->GetPosition().z > 225.0f)
+				{
+					camRotZ -= 0.75f;
+				}
+				else if (m_Camera->GetPosition().z < 125.0f)
+				{
+					camRotZ += 0.75f;
+				}
+			}
+			else if (m_Camera->GetPosition().x > -235.0f)
+			{
+				isInteractDoor = true;
+				camRotX -= 0.75f;
+			}
+
+			/*if (m_Camera->GetPosition().z > 200.0f && m_Camera->GetPosition().z < 250.0f)
+			{
+				if (m_Camera->GetPosition().x > 170.0f)
+				{
+					camRotX -= 0.75f;
+				}
+			}
+			else if (m_Camera->GetPosition().z > 350.0f && m_Camera->GetPosition().z < 400.0f)
+			{
+				if (m_Camera->GetPosition().x > 170.0f)
+				{
+					camRotX -= 0.75f;
+				}
+			}*/
+		}
+		else if (inCorridor == 3)
+		{
+			if (m_Camera->GetPosition().x > -520.00f)
+			{
+				inCorridor = 0;
+				camRotX += 75.5f;
+				camRotY -= 55.0f;
+			}
+			else if (m_Camera->GetPosition().x < -520.0f && m_Camera->GetPosition().x > -545.0f)
+			{
+				isInteractDoor = false;
+				if (m_Camera->GetPosition().z < -225.0f)
+				{
+					camRotZ += 0.75f;
+				}
+				else if (m_Camera->GetPosition().z > -125.0f)
+				{
+					camRotZ -= 0.75f;
+				}
+			}
+			else if (m_Camera->GetPosition().x < -545.0f)
+			{
+				isInteractDoor = true;
+				camRotX += 0.75f;
+			}
+		}
+		else if (inCorridor == 4)
+		{
+			if (m_Camera->GetPosition().x < -260.0f)
+			{
+				inCorridor = 0;
+				camRotX -= 75.5f;
+				camRotY -= 55.0f;
+			}
+			else if (m_Camera->GetPosition().x > -260.0f && m_Camera->GetPosition().x < -225.0f)
+			{
+				if (m_Camera->GetPosition().z < -225.0f)
+				{
+					camRotZ += 0.75f;
+				}
+				else if (m_Camera->GetPosition().z > -125.0f)
+				{
+					camRotZ -= 0.75f;
+				}
+			}
+			else if (m_Camera->GetPosition().x > -215.0f && m_Camera->GetPosition().x < -200.0f)
+			{
+				if (m_Camera->GetPosition().z < -200.0f)
+				{
+					camRotZ += 0.75f;
+				}
+				else if (m_Camera->GetPosition().z > -150.0f)
+				{
+					camRotZ -= 0.75f;
+				}
+			}
+			else if (m_Camera->GetPosition().x > -200.0f)
+			{
+				mapNum = 0;
+				inCorridor = 3;
+			}
+
+			if (m_Camera->GetPosition().z < -100.0f && m_Camera->GetPosition().z > -140.0f)
+			{
+				if (m_Camera->GetPosition().x > -225.0f)
+				{
+					camRotX -= 0.75f;
+				}
+			}
+			else if (m_Camera->GetPosition().z < -210.0f && m_Camera->GetPosition().z > -240.0f)
+			{
+				if (m_Camera->GetPosition().x > -225.0f)
+				{
+					camRotX -= 0.75f;
+				}
+			}
+		}
+	}
 	
 	m_Camera->SetPosition(camRotX, camRotY, camRotZ);
 

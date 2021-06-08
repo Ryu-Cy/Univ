@@ -134,7 +134,7 @@ bool TextClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceCont
 	}
 
 	// Now update the sentence vertex buffer with the new string information.
-	result = UpdateSentence(m_sentence5, "Goodbye", 100, 300, 1.0f, 1.0f, 0.0f, deviceContext);
+	result = UpdateSentence(m_sentence5, "", 100, 300, 1.0f, 1.0f, 0.0f, deviceContext);
 	if (!result)
 	{
 		return false;
@@ -147,7 +147,7 @@ bool TextClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceCont
 	}
 
 	// Now update the sentence vertex buffer with the new string information.
-	result = UpdateSentence(m_sentence6, "Goodbye", 100, 400, 1.0f, 1.0f, 0.0f, deviceContext);
+	result = UpdateSentence(m_sentence6, "", 100, 400, 1.0f, 1.0f, 0.0f, deviceContext);
 	if (!result)
 	{
 		return false;
@@ -689,26 +689,46 @@ bool TextClass::SetNumOfPolygons(int index_Count, ID3D11DeviceContext* deviceCon
 	return true;
 }
 
-bool TextClass::SetNeedCard(bool isCard, ID3D11DeviceContext* deviceContext)
+bool TextClass::SetNeedCard(bool isCard, bool isInteract, ID3D11DeviceContext* deviceContext)
 {
 	char CardString[24];
 	bool result;
 
 
 	// Setup the cpu string.
-	strcpy_s(CardString, "Need Card!");
+	if (isCard)
+	{
+		strcpy_s(CardString, "");
+	}
+	else if (!isCard)
+	{
+		strcpy_s(CardString, "Need Card!");
+	}
 
 	// Update the sentence vertex buffer with the new string information.
-	result = UpdateSentence(m_sentence5, CardString, 700, 100, 1.0f, 0.0f, 0.0f, deviceContext);
-	if (!result)
+	if (isInteract)
 	{
-		return false;
+		result = UpdateSentence(m_sentence5, CardString, 700, 100, 1.0f, 0.0f, 0.0f, deviceContext);
+		if (!result)
+		{
+			return false;
+		}
 	}
+	else
+	{
+		result = UpdateSentence(m_sentence5, "", 700, 100, 1.0f, 0.0f, 0.0f, deviceContext);
+		if (!result)
+		{
+			return false;
+		}
+	}
+	
+	
 
 	return true;
 }
 
-bool TextClass::SetLocked(bool isLocked, ID3D11DeviceContext* deviceContext)
+bool TextClass::SetLocked(bool isLocked, bool isInteract, ID3D11DeviceContext* deviceContext)
 {
 	char CardString[24];
 	bool result;
@@ -718,11 +738,24 @@ bool TextClass::SetLocked(bool isLocked, ID3D11DeviceContext* deviceContext)
 	strcpy_s(CardString, "Door is Locked!");
 
 	// Update the sentence vertex buffer with the new string information.
-	result = UpdateSentence(m_sentence6, CardString, 700, 80, 1.0f, 0.0f, 0.0f, deviceContext);
-	if (!result)
+	if (isInteract)
 	{
-		return false;
+		result = UpdateSentence(m_sentence6, CardString, 700, 80, 1.0f, 0.0f, 0.0f, deviceContext);
+		if (!result)
+		{
+			return false;
+		}
 	}
+	else
+	{
+		result = UpdateSentence(m_sentence6, "", 700, 80, 1.0f, 0.0f, 0.0f, deviceContext);
+		if (!result)
+		{
+			return false;
+		}
+	}
+	
+	
 
 	return true;
 }

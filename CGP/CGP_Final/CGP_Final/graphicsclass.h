@@ -59,6 +59,8 @@ public:
 	int inCorridor;
 
 	bool getCard;
+	bool isInteractDoor;
+	bool isInteractEscape;
 
 	int num_of_polygons;
 	int num_of_objects;

@@ -216,6 +216,7 @@ void SystemClass::Run()
 		m_Graphics->lX += m_Input->GetMouselX();
 		m_Graphics->lY += m_Input->GetMouselY();
 		m_Graphics->GetCamera()->SetRotation(m_Graphics->lY * 0.03f, m_Graphics->lX * 0.03f, 0.0f);
+
 	}
 
 	return;
