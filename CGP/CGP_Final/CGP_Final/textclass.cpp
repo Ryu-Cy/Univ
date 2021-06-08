@@ -11,6 +11,12 @@ TextClass::TextClass()
 
 	m_sentence1 = 0;
 	m_sentence2 = 0;
+	m_sentence3 = 0;
+	m_sentence4 = 0;
+	m_sentence5 = 0;
+	m_sentence6 = 0;
+	m_sentence7 = 0;
+	m_sentence8 = 0;
 }
 
 
@@ -95,6 +101,84 @@ bool TextClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceCont
 		return false;
 	}
 
+	result = InitializeSentence(&m_sentence3, 16, device);
+	if (!result)
+	{
+		return false;
+	}
+
+	// Now update the sentence vertex buffer with the new string information.
+	result = UpdateSentence(m_sentence3, "Goodbye", 100, 300, 1.0f, 1.0f, 0.0f, deviceContext);
+	if (!result)
+	{
+		return false;
+	}
+
+	result = InitializeSentence(&m_sentence4, 16, device);
+	if (!result)
+	{
+		return false;
+	}
+
+	// Now update the sentence vertex buffer with the new string information.
+	result = UpdateSentence(m_sentence4, "Goodbye", 100, 400, 1.0f, 1.0f, 0.0f, deviceContext);
+	if (!result)
+	{
+		return false;
+	}
+
+	result = InitializeSentence(&m_sentence5, 16, device);
+	if (!result)
+	{
+		return false;
+	}
+
+	// Now update the sentence vertex buffer with the new string information.
+	result = UpdateSentence(m_sentence5, "Goodbye", 100, 300, 1.0f, 1.0f, 0.0f, deviceContext);
+	if (!result)
+	{
+		return false;
+	}
+
+	result = InitializeSentence(&m_sentence6, 16, device);
+	if (!result)
+	{
+		return false;
+	}
+
+	// Now update the sentence vertex buffer with the new string information.
+	result = UpdateSentence(m_sentence6, "Goodbye", 100, 400, 1.0f, 1.0f, 0.0f, deviceContext);
+	if (!result)
+	{
+		return false;
+	}
+
+	result = InitializeSentence(&m_sentence7, 16, device);
+	if (!result)
+	{
+		return false;
+	}
+
+	// Now update the sentence vertex buffer with the new string information.
+	result = UpdateSentence(m_sentence7, "Goodbye", 100, 400, 1.0f, 1.0f, 0.0f, deviceContext);
+	if (!result)
+	{
+		return false;
+	}
+
+	result = InitializeSentence(&m_sentence8, 16, device);
+	if (!result)
+	{
+		return false;
+	}
+
+	// Now update the sentence vertex buffer with the new string information.
+	result = UpdateSentence(m_sentence8, "Goodbye", 100, 400, 1.0f, 1.0f, 0.0f, deviceContext);
+	if (!result)
+	{
+		return false;
+	}
+
 	return true;
 }
 
@@ -106,6 +190,25 @@ void TextClass::Shutdown()
 
 	// Release the second sentence.
 	ReleaseSentence(&m_sentence2);
+
+	// Release the second sentence.
+	ReleaseSentence(&m_sentence3);
+
+	// Release the second sentence.
+	ReleaseSentence(&m_sentence4);
+
+	// Release the second sentence.
+	ReleaseSentence(&m_sentence5);
+
+	// Release the second sentence.
+	ReleaseSentence(&m_sentence6);
+
+	// Release the second sentence.
+	ReleaseSentence(&m_sentence7);
+
+	// Release the second sentence.
+	ReleaseSentence(&m_sentence8);
+
 
 	// Release the font shader object.
 	if (m_FontShader)
@@ -141,6 +244,43 @@ bool TextClass::Render(ID3D11DeviceContext* deviceContext, D3DXMATRIX worldMatri
 
 	// Draw the second sentence.
 	result = RenderSentence(deviceContext, m_sentence2, worldMatrix, orthoMatrix);
+	if (!result)
+	{
+		return false;
+	}
+
+	result = RenderSentence(deviceContext, m_sentence3, worldMatrix, orthoMatrix);
+	if (!result)
+	{
+		return false;
+	}
+
+
+	result = RenderSentence(deviceContext, m_sentence4, worldMatrix, orthoMatrix);
+	if (!result)
+	{
+		return false;
+	}
+
+	result = RenderSentence(deviceContext, m_sentence5, worldMatrix, orthoMatrix);
+	if (!result)
+	{
+		return false;
+	}
+
+	result = RenderSentence(deviceContext, m_sentence6, worldMatrix, orthoMatrix);
+	if (!result)
+	{
+		return false;
+	}
+
+	result = RenderSentence(deviceContext, m_sentence7, worldMatrix, orthoMatrix);
+	if (!result)
+	{
+		return false;
+	}
+
+	result = RenderSentence(deviceContext, m_sentence8, worldMatrix, orthoMatrix);
 	if (!result)
 	{
 		return false;
@@ -498,5 +638,120 @@ bool TextClass::SetCpu(int cpu, ID3D11DeviceContext* deviceContext)
 		return false;
 	}
 
+	return true;
+}
+
+bool TextClass::SetNumOfObject(int num_of_object, ID3D11DeviceContext* deviceContext)
+{
+	char tempString[16];
+	char objectString[16];
+	bool result;
+
+
+	// Convert the cpu integer to string format.
+	_itoa_s(num_of_object, tempString, 10);
+
+	// Setup the cpu string.
+	strcpy_s(objectString, "Object: ");
+	strcat_s(objectString, tempString);
+
+	// Update the sentence vertex buffer with the new string information.
+	result = UpdateSentence(m_sentence3, objectString, 20, 60, 0.0f, 1.0f, 0.0f, deviceContext);
+	if (!result)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool TextClass::SetNumOfPolygons(int index_Count, ID3D11DeviceContext* deviceContext)
+{
+	char tempString[24];
+	char indexString[24];
+	bool result;
+
+
+	// Convert the cpu integer to string format.
+	_itoa_s(index_Count, tempString, 10);
+
+	// Setup the cpu string.
+	strcpy_s(indexString, "Polygons: ");
+	strcat_s(indexString, tempString);
+
+	// Update the sentence vertex buffer with the new string information.
+	result = UpdateSentence(m_sentence4, indexString, 20, 80, 0.0f, 1.0f, 0.0f, deviceContext);
+	if (!result)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool TextClass::SetNeedCard(bool isCard, ID3D11DeviceContext* deviceContext)
+{
+	char CardString[24];
+	bool result;
+
+
+	// Setup the cpu string.
+	strcpy_s(CardString, "Need Card!");
+
+	// Update the sentence vertex buffer with the new string information.
+	result = UpdateSentence(m_sentence5, CardString, 700, 100, 1.0f, 0.0f, 0.0f, deviceContext);
+	if (!result)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool TextClass::SetLocked(bool isLocked, ID3D11DeviceContext* deviceContext)
+{
+	char CardString[24];
+	bool result;
+
+
+	// Setup the cpu string.
+	strcpy_s(CardString, "Door is Locked!");
+
+	// Update the sentence vertex buffer with the new string information.
+	result = UpdateSentence(m_sentence6, CardString, 700, 80, 1.0f, 0.0f, 0.0f, deviceContext);
+	if (!result)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool TextClass::SetScreen(ID3D11DeviceContext* deviceContext)
+{
+	char tempString[24];
+	char WidthString[24];
+	char HeightString[24];
+	bool result;
+
+	_itoa_s(m_screenWidth, tempString, 10);
+	strcpy_s(WidthString, "Width: ");
+	strcat_s(WidthString, tempString);
+
+	result = UpdateSentence(m_sentence7, WidthString, 20, 100, 0.0f, 1.0f, 0.0f, deviceContext);
+	if (!result)
+	{
+		return false;
+	}
+
+	_itoa_s(m_screenHeight, tempString, 10);
+	strcpy_s(HeightString, "Height: ");
+	strcat_s(HeightString, tempString);
+
+	result = UpdateSentence(m_sentence8, HeightString, 20, 120, 0.0f, 1.0f, 0.0f, deviceContext);
+	if (!result)
+	{
+		return false;
+	}
 	return true;
 }

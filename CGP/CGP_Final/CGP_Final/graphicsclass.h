@@ -60,6 +60,9 @@ public:
 
 	bool getCard;
 
+	int num_of_polygons;
+	int num_of_objects;
+
 private:
 	D3DClass* m_D3D;
 	CameraClass* m_Camera;

@@ -21,6 +21,9 @@ GraphicsClass::GraphicsClass()
 
 	getCard = false;
 
+	num_of_polygons = 0;
+	num_of_objects = 0;
+
 	camRotX = 0.0f;
 	camRotY = 45.0f;
 	camRotZ = -10.0f;
@@ -412,6 +415,36 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 		return false;
 	}
 
+	result = m_Text->SetNumOfObject(num_of_objects, m_D3D->GetDeviceContext());
+	if (!result)
+	{
+		return false;
+	}
+
+	result = m_Text->SetNumOfPolygons(num_of_polygons, m_D3D->GetDeviceContext());
+	if (!result)
+	{
+		return false;
+	}
+
+	result = m_Text->SetNeedCard(getCard, m_D3D->GetDeviceContext());
+	if (!result)
+	{
+		return false;
+	}
+
+	result = m_Text->SetLocked(num_of_polygons, m_D3D->GetDeviceContext());
+	if (!result)
+	{
+		return false;
+	}
+
+	result = m_Text->SetScreen(m_D3D->GetDeviceContext());
+	if (!result)
+	{
+		return false;
+	}
+
 	// Render the graphics scene.
 	result = Render(rotation);
 	if (!result)
@@ -633,6 +666,9 @@ bool GraphicsClass::Render(float rotation)
 	bool result;
 	D3DXVECTOR3 cameraPosition;
 
+	num_of_objects = 0;
+	num_of_polygons = 0;
+
 
 	// Clear the buffers to begin the scene.
 	m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
@@ -692,6 +728,8 @@ bool GraphicsClass::Render(float rotation)
 	// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
 	// CardKey
 	m_Card->Render(m_D3D->GetDeviceContext());
+	num_of_objects++;
+	num_of_polygons += m_Card->GetIndexCount();
 
 	// Render the model using the light shader.
 	if (getCard)
@@ -760,9 +798,12 @@ bool GraphicsClass::Render(float rotation)
 	D3DXMatrixMultiply(&doorMatrix[8], &doorMoveMatrix[8], &doorScalingMatrix);
 	D3DXMatrixMultiply(&doorMatrix[9], &doorMoveMatrix[9], &doorScalingMatrix);
 
+
 	// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
 	// Map1-3
 	m_Map[0]->Render(m_D3D->GetDeviceContext());
+	num_of_objects++;
+	num_of_polygons += m_Map[0]->GetIndexCount();
 
 	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Map[0]->GetIndexCount(), worldMatrix[9], viewMatrix, projectionMatrix1,
 		*m_Map[0]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
@@ -773,6 +814,8 @@ bool GraphicsClass::Render(float rotation)
 	}
 
 	m_Map[1]->Render(m_D3D->GetDeviceContext());
+	num_of_objects++;
+	num_of_polygons += m_Map[1]->GetIndexCount();
 
 	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Map[1]->GetIndexCount(), worldMatrix[9], viewMatrix, projectionMatrix1,
 		*m_Map[1]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
@@ -783,6 +826,8 @@ bool GraphicsClass::Render(float rotation)
 	}
 
 	m_Map[2]->Render(m_D3D->GetDeviceContext());
+	num_of_objects++;
+	num_of_polygons += m_Map[2]->GetIndexCount();
 
 	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Map[2]->GetIndexCount(), worldMatrix[9], viewMatrix, projectionMatrix1,
 		*m_Map[2]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
@@ -794,6 +839,8 @@ bool GraphicsClass::Render(float rotation)
 	// ¸Ê2 ·»´õ¸µ
 
 	m_Map[0]->Render(m_D3D->GetDeviceContext());
+	num_of_objects++;
+	num_of_polygons += m_Map[0]->GetIndexCount();
 
 	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Map[0]->GetIndexCount(), Map2Matrix, viewMatrix, projectionMatrix1,
 		*m_Map[0]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
@@ -804,6 +851,8 @@ bool GraphicsClass::Render(float rotation)
 	}
 
 	m_Map[1]->Render(m_D3D->GetDeviceContext());
+	num_of_objects++;
+	num_of_polygons += m_Map[1]->GetIndexCount();
 
 	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Map[1]->GetIndexCount(), Map2Matrix, viewMatrix, projectionMatrix1,
 		*m_Map[1]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
@@ -814,6 +863,8 @@ bool GraphicsClass::Render(float rotation)
 	}
 
 	m_Map[2]->Render(m_D3D->GetDeviceContext());
+	num_of_objects++;
+	num_of_polygons += m_Map[2]->GetIndexCount();
 
 	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Map[2]->GetIndexCount(), Map2Matrix, viewMatrix, projectionMatrix1,
 		*m_Map[2]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
@@ -825,6 +876,8 @@ bool GraphicsClass::Render(float rotation)
 
 
 	m_Door[0]->Render(m_D3D->GetDeviceContext());
+	num_of_objects++;
+	num_of_polygons += m_Door[0]->GetIndexCount();
 
 	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Door[0]->GetIndexCount(), doorMatrix[0], viewMatrix, projectionMatrix1,
 		*m_Door[0]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
@@ -835,6 +888,8 @@ bool GraphicsClass::Render(float rotation)
 	}
 
 	m_Door[0]->Render(m_D3D->GetDeviceContext());
+	num_of_objects++;
+	num_of_polygons += m_Door[0]->GetIndexCount();
 
 	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Door[0]->GetIndexCount(), doorMatrix[4], viewMatrix, projectionMatrix1,
 		*m_Door[0]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
@@ -845,6 +900,8 @@ bool GraphicsClass::Render(float rotation)
 	}
 
 	m_Door[0]->Render(m_D3D->GetDeviceContext());
+	num_of_objects++;
+	num_of_polygons += m_Door[0]->GetIndexCount();
 
 	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Door[0]->GetIndexCount(), doorMatrix[5], viewMatrix, projectionMatrix1,
 		*m_Door[0]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
@@ -855,6 +912,8 @@ bool GraphicsClass::Render(float rotation)
 	}
 
 	m_Door[0]->Render(m_D3D->GetDeviceContext());
+	num_of_objects++;
+	num_of_polygons += m_Door[0]->GetIndexCount();
 
 	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Door[0]->GetIndexCount(), doorRotateMatrix[0] * doorMatrix[3], viewMatrix, projectionMatrix1,
 		*m_Door[0]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
@@ -865,6 +924,8 @@ bool GraphicsClass::Render(float rotation)
 	}
 
 	m_Door[0]->Render(m_D3D->GetDeviceContext());
+	num_of_objects++;
+	num_of_polygons += m_Door[0]->GetIndexCount();
 
 	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Door[0]->GetIndexCount(), doorRotateMatrix[0] * doorMatrix[1], viewMatrix, projectionMatrix1,
 		*m_Door[0]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
@@ -876,6 +937,8 @@ bool GraphicsClass::Render(float rotation)
 
 
 	m_Door[0]->Render(m_D3D->GetDeviceContext());
+	num_of_objects++;
+	num_of_polygons += m_Door[0]->GetIndexCount();
 
 	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Door[0]->GetIndexCount(), doorRotateMatrix[0] * doorMatrix[2], viewMatrix, projectionMatrix1,
 		*m_Door[0]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
@@ -889,6 +952,8 @@ bool GraphicsClass::Render(float rotation)
 	// À§¾Æ·¡ ÀÖ´Â°Å
 
 	m_Door[0]->Render(m_D3D->GetDeviceContext());
+	num_of_objects++;
+	num_of_polygons += m_Door[0]->GetIndexCount();
 
 	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Door[0]->GetIndexCount(), doorRotateMatrix[2] * doorMatrix[6], viewMatrix, projectionMatrix1,
 		*m_Door[0]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
@@ -899,6 +964,8 @@ bool GraphicsClass::Render(float rotation)
 	}
 
 	m_Door[0]->Render(m_D3D->GetDeviceContext());
+	num_of_objects++;
+	num_of_polygons += m_Door[0]->GetIndexCount();
 
 	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Door[0]->GetIndexCount(), doorRotateMatrix[1] * doorMatrix[7], viewMatrix, projectionMatrix1,
 		*m_Door[0]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
@@ -909,6 +976,8 @@ bool GraphicsClass::Render(float rotation)
 	}
 
 	m_Door[0]->Render(m_D3D->GetDeviceContext());
+	num_of_objects++;
+	num_of_polygons += m_Door[0]->GetIndexCount();
 
 	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Door[0]->GetIndexCount(), doorRotateMatrix[2] * doorMatrix[8], viewMatrix, projectionMatrix1,
 		*m_Door[0]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
@@ -919,6 +988,8 @@ bool GraphicsClass::Render(float rotation)
 	}
 
 	m_Door[0]->Render(m_D3D->GetDeviceContext());
+	num_of_objects++;
+	num_of_polygons += m_Door[0]->GetIndexCount();
 
 	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Door[0]->GetIndexCount(), doorRotateMatrix[1] * doorMatrix[9], viewMatrix, projectionMatrix1,
 		*m_Door[0]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
