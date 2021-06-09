@@ -24,7 +24,7 @@ GraphicsClass::GraphicsClass()
 	blink = 0;
 
 	getCard = false;
-	turnOnLight = false;
+	turnOnLight = true;
 	isInteractDoor = false;
 	isInteractEscape = false;
 
@@ -96,7 +96,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	}
 
-	// Initialize the model[CardKey] object.
+	// Initialize the model[CardKey] object.	
 	result = m_Card->Initialize(m_D3D->GetDevice(), "../CGP_Final/data/KeyCard/Chip_key_2/Material/key.obj", L"../CGP_Final/data/KeyCard/Chip_key_2/Texturizer/metal_1.jpg",
 		L"../CGP_Final/data/stars.jpg", L"../CGP_Final/data/KeyCard/Chip_key_2/Texturizer/Blury.jpg",
 		L"../CGP_Final/data/KeyCard/Chip_key_2/Texturizer/Lake.jpg");
@@ -1370,7 +1370,7 @@ bool GraphicsClass::Render(float rotation)
 
 	D3DXMatrixScaling(&worldMatrixFireSca[0], 55.0f, 40.0f, 1.0f);
 	D3DXMatrixRotationY(&worldMatrixFireRot[0], (m_Camera->GetRotation().y + 1.57f) * 0.0174532925f);
-	D3DXMatrixMultiply(&worldMatrixFire[0], &worldMatrixFireRot[0], &worldMatrixFireSca[0]);
+	D3DXMatrixMultiply(&worldMatrixFire[0], &worldMatrixFireSca[0], &worldMatrixFireRot[0]);
 	D3DXMatrixTranslation(&worldMatrixFireTrs[0], 50.0f, 40.0f, -380.0f);
 	worldMatrixFire[0] *= worldMatrixFireTrs[0];
 
