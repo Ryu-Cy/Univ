@@ -970,6 +970,9 @@ bool GraphicsClass::Render(float rotation)
 	D3DXVECTOR3 cameraPosition;
 
 	D3DXMATRIX worldMatrixFire[3];
+	D3DXMATRIX worldMatrixFireRot[3];
+	D3DXMATRIX worldMatrixFireSca[3];
+	D3DXMATRIX worldMatrixFireTrs[3];
 	D3DXVECTOR3 scrollSpeeds, scales;
 	D3DXVECTOR2 distortion1, distortion2, distortion3;
 	float distortionScale, distortionBias;
@@ -1019,6 +1022,12 @@ bool GraphicsClass::Render(float rotation)
 
 	for (int i = 0; i < 3; i++)
 		m_D3D->GetWorldMatrix(worldMatrixFire[i]);
+	for (int i = 0; i < 3; i++)
+		m_D3D->GetWorldMatrix(worldMatrixFireRot[i]);
+	for (int i = 0; i < 3; i++)
+		m_D3D->GetWorldMatrix(worldMatrixFireSca[i]);
+	for (int i = 0; i < 3; i++)
+		m_D3D->GetWorldMatrix(worldMatrixFireTrs[i]);
 
 	m_D3D->GetOrthoMatrix(orthoMatrix);
 
@@ -1356,7 +1365,14 @@ bool GraphicsClass::Render(float rotation)
 		return false;
 	}
 
-	D3DXMatrixScaling(&worldMatrixFire[0], 50.f, 50.f, 50.f);
+	// Turn the Z buffer back on now that all 2D rendering has completed.
+	m_D3D->TurnZBufferOn();
+
+	D3DXMatrixScaling(&worldMatrixFireSca[0], 55.0f, 40.0f, 1.0f);
+	D3DXMatrixRotationY(&worldMatrixFireRot[0], (m_Camera->GetRotation().y + 1.57f) * 0.0174532925f);
+	D3DXMatrixMultiply(&worldMatrixFire[0], &worldMatrixFireRot[0], &worldMatrixFireSca[0]);
+	D3DXMatrixTranslation(&worldMatrixFireTrs[0], 50.0f, 40.0f, -380.0f);
+	worldMatrixFire[0] *= worldMatrixFireTrs[0];
 
 	// Put the square model vertex and index buffers on the graphics pipeline to prepare them for drawing.
 	m_Fire[0]->Render(m_D3D->GetDeviceContext());
@@ -1374,8 +1390,6 @@ bool GraphicsClass::Render(float rotation)
 	// Turn off alpha blending after rendering the text.
 	m_D3D->TurnOffAlphaBlending();
 
-	// Turn the Z buffer back on now that all 2D rendering has completed.
-	m_D3D->TurnZBufferOn();
 
 	// Present the rendered scene to the screen.
 	m_D3D->EndScene();
