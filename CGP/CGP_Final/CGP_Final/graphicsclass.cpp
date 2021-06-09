@@ -11,6 +11,9 @@ GraphicsClass::GraphicsClass()
 	m_LightShader = 0;
 	m_Light = 0;
 	m_Card = 0;
+	
+	for (int i = 0; i < 3; i++)
+		m_Fire[i] = 0;
 	for (int i = 0; i < 3; i++)
 		m_Map[i] = 0;
 	for (int i = 0; i < 2; i++)
@@ -18,8 +21,10 @@ GraphicsClass::GraphicsClass()
 
 	mapNum = 0;
 	inCorridor = 0;
+	blink = 0;
 
 	getCard = false;
+	turnOnLight = false;
 	isInteractDoor = false;
 	isInteractEscape = false;
 
@@ -37,6 +42,8 @@ GraphicsClass::GraphicsClass()
 
 	m_SkyDome = 0;
 	m_SkyDomeShader = 0;
+
+	m_FireShader = 0;
 }
 
 
@@ -97,6 +104,37 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	if (!result)
 	{
 		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
+		return false;
+	}
+
+	for (int i = 0; i < 3; i++)
+	{
+		m_Fire[i] = new FireClass;
+		if (!m_Fire[i])
+		{
+			return false;
+		}
+
+		result = m_Fire[i]->Initialize(m_D3D->GetDevice(), "../CGP_Final/data/square.txt", L"../CGP_Final/data/fire01.dds", 
+			L"../CGP_Final/data/noise01.dds", L"../CGP_Final/data/alpha01.dds");
+
+		if (!result)
+		{
+			MessageBox(hwnd, L"Could not initialize the Fire model object.", L"Error", MB_OK);
+			return false;
+		}
+	}
+
+	m_FireShader = new FireShaderClass;
+	if (!m_FireShader)
+	{
+		return false;
+	}
+
+	result = m_FireShader->Initialize(m_D3D->GetDevice(), hwnd);
+	if (!result)
+	{
+		MessageBox(hwnd, L"Could not initialize the fire shader object.", L"Error", MB_OK);
 		return false;
 	}
 
@@ -188,11 +226,11 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	// Initialize the light object.
-	m_Light->SetAmbientColor(0.15f, 0.15f, 0.15f, 1.0f);
-	m_Light->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
-	m_Light->SetDirection(0.0f, 0.0f, 1.0f);
+	m_Light->SetAmbientColor(0.075f, 0.075f, 0.075f, 1.0f);
+	m_Light->SetDiffuseColor(0.0f, 0.0f, 0.0f, 1.0f);
+	m_Light->SetDirection(0.0f, -0.5f, 0.5f);
 	m_Light->SetSpecularColor(1.0f, 1.0f, 1.0f, 1.0f);
-	m_Light->SetSpecularPower(32.0f);
+	m_Light->SetSpecularPower(100.0f);
 	
 	// Create the texture shader object.
 	m_TextureShader = new TextureShaderClass;
@@ -319,6 +357,23 @@ void GraphicsClass::Shutdown()
 		m_Card = 0;
 	}
 
+	for (int i = 0; i < 3; i++)
+	{
+		if (m_Fire[i])
+		{
+			m_Fire[i]->Shutdown();
+			delete m_Fire[i];
+			m_Fire[i] = 0;
+		}
+	}
+
+	if (m_FireShader)
+	{
+		m_FireShader->Shutdown();
+		delete m_FireShader;
+		m_FireShader = 0;
+	}
+
 	// Release the map object.
 	for (int i = 0; i < 3; i++)
 	{
@@ -395,7 +450,15 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 	{
 		rotation -= 360.0f;
 	}
-
+	
+	if (turnOnLight)
+	{
+		blink += 1;
+		m_Light->Blink(m_Light, blink);
+		if (blink > 120)
+			blink = 0;
+	}
+	
 	// Set the location of the mouse.
 	result = m_Text->SetMousePosition(mouseX, mouseY, m_D3D->GetDeviceContext());
 	if (!result)
@@ -903,11 +966,40 @@ bool GraphicsClass::Render(float rotation)
 	D3DXMATRIX Map2Scaling;
 	D3DXMATRIX Map2Matrix;
 	bool result;
+
 	D3DXVECTOR3 cameraPosition;
+
+	D3DXMATRIX worldMatrixFire[3];
+	D3DXVECTOR3 scrollSpeeds, scales;
+	D3DXVECTOR2 distortion1, distortion2, distortion3;
+	float distortionScale, distortionBias;
+	static float frameTime = 0.0f;
+
 
 	num_of_objects = 0;
 	num_of_polygons = 0;
 
+	// Increment the frame time counter.
+	frameTime += 0.01f;
+	if (frameTime > 1000.0f)
+	{
+		frameTime = 0.0f;
+	}
+
+	// Set the three scrolling speeds for the three different noise textures.
+	scrollSpeeds = D3DXVECTOR3(1.3f, 2.1f, 2.3f);
+
+	// Set the three scales which will be used to create the three different noise octave textures.
+	scales = D3DXVECTOR3(1.0f, 2.0f, 3.0f);
+
+	// Set the three different x and y distortion factors for the three different noise textures.
+	distortion1 = D3DXVECTOR2(0.1f, 0.2f);
+	distortion2 = D3DXVECTOR2(0.1f, 0.3f);
+	distortion3 = D3DXVECTOR2(0.1f, 0.1f);
+
+	// The the scale and bias of the texture coordinate sampling perturbation.
+	distortionScale = 0.8f;
+	distortionBias = 0.5f;
 
 	// Clear the buffers to begin the scene.
 	m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
@@ -924,6 +1016,10 @@ bool GraphicsClass::Render(float rotation)
 	for (int i = 0; i < 10; i++)
 		m_D3D->GetWorldMatrix(doorMoveMatrix[i]);
 	m_D3D->GetWorldMatrix(Map2Matrix);
+
+	for (int i = 0; i < 3; i++)
+		m_D3D->GetWorldMatrix(worldMatrixFire[i]);
+
 	m_D3D->GetOrthoMatrix(orthoMatrix);
 
 	//m_D3D->SetWorldMatrix(worldMatrix);
@@ -1255,6 +1351,21 @@ bool GraphicsClass::Render(float rotation)
 
 	// Render the text strings.
 	result = m_Text->Render(m_D3D->GetDeviceContext(), worldMatrix[10], orthoMatrix);
+	if (!result)
+	{
+		return false;
+	}
+
+	D3DXMatrixScaling(&worldMatrixFire[0], 50.f, 50.f, 50.f);
+
+	// Put the square model vertex and index buffers on the graphics pipeline to prepare them for drawing.
+	m_Fire[0]->Render(m_D3D->GetDeviceContext());
+
+	// Render the square model using the fire shader.
+	result = m_FireShader->Render(m_D3D->GetDeviceContext(), m_Fire[0]->GetIndexCount(), worldMatrixFire[0], viewMatrix, projectionMatrix,
+		m_Fire[0]->GetTexture1(), m_Fire[0]->GetTexture2(), m_Fire[0]->GetTexture3(), frameTime, scrollSpeeds,
+		scales, distortion1, distortion2, distortion3, distortionScale, distortionBias);
+
 	if (!result)
 	{
 		return false;

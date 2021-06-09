@@ -22,6 +22,9 @@
 #include "skydomeclass.h"
 #include "skydomeshaderclass.h"
 
+#include "fireclass.h"
+#include "fireshaderclass.h"
+
 #include "textclass.h"
 
 /////////////
@@ -57,8 +60,10 @@ public:
 
 	int mapNum;
 	int inCorridor;
+	int blink;
 
 	bool getCard;
+	bool turnOnLight;
 	bool isInteractDoor;
 	bool isInteractEscape;
 
@@ -71,6 +76,7 @@ private:
 	ModelClass* m_Card;
 	ModelClass* m_Map[3];
 	ModelClass* m_Door[2];
+	FireClass* m_Fire[3];
 	LightShaderClass* m_LightShader;
 	LightClass* m_Light;
 
@@ -83,6 +89,8 @@ private:
 
 	SkyDomeClass* m_SkyDome;
 	SkyDomeShaderClass* m_SkyDomeShader;
+
+	FireShaderClass* m_FireShader;
 };
 
 #endif

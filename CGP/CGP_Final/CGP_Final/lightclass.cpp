@@ -82,3 +82,15 @@ float LightClass::GetSpecularPower()
 {
 	return m_specularPower;
 }
+
+void LightClass::Blink(LightClass* m_Light, int blink)
+{
+	if (blink % 120 < 10)
+	{
+		m_Light->SetDiffuseColor(0.0f, 0.0f, 0.0f, 0.0f);
+	}
+	else
+	{
+		m_Light->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
+	}
+}

@@ -64,6 +64,10 @@ public:
 	int GetIndexCount();
 	ID3D11ShaderResourceView** GetTexture();
 
+	ID3D11ShaderResourceView* GetTexture1();
+	ID3D11ShaderResourceView* GetTexture2();
+	ID3D11ShaderResourceView* GetTexture3();
+
 	bool ReadFileCounts(const char*, int& vertexCount, int& textureCount, int& normalCount, int& faceCount);
 	bool LoadDataStructures(const char*, int vertexCount, int textureCount, int normalCount, int faceCount);
 	
@@ -82,6 +86,7 @@ private:
 	ID3D11Buffer* m_vertexBuffer, * m_indexBuffer;
 	int m_vertexCount, m_indexCount;
 	TextureArrayClass* m_TextureArray;
+	TextureClass* m_Texture1, * m_Texture2, * m_Texture3;
 	ModelType* m_model;
 };
 

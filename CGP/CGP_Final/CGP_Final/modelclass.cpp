@@ -9,6 +9,9 @@ ModelClass::ModelClass()
 	m_vertexBuffer = 0;
 	m_indexBuffer = 0;
 	m_TextureArray = 0;
+	m_Texture1 = 0;
+	m_Texture2 = 0;
+	m_Texture3 = 0;
 	m_model = 0;
 }
 
@@ -521,6 +524,23 @@ void ModelClass::ReleaseTexture()
 	}
 
 	return;
+}
+
+ID3D11ShaderResourceView* ModelClass::GetTexture1()
+{
+	return m_Texture1->GetTexture();
+}
+
+
+ID3D11ShaderResourceView* ModelClass::GetTexture2()
+{
+	return m_Texture2->GetTexture();
+}
+
+
+ID3D11ShaderResourceView* ModelClass::GetTexture3()
+{
+	return m_Texture3->GetTexture();
 }
 
 

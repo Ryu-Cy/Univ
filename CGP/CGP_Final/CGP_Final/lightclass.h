@@ -11,6 +11,7 @@
 #include <d3dx10math.h>
 
 
+
 ////////////////////////////////////////////////////////////////////////////////
 // Class name: LightClass
 ////////////////////////////////////////////////////////////////////////////////
@@ -32,6 +33,8 @@ public:
 	D3DXVECTOR3 GetDirection();
 	D3DXVECTOR4 GetSpecularColor();
 	float GetSpecularPower();
+
+	void Blink(LightClass*, int);
 
 private:
 	D3DXVECTOR4 m_ambientColor;
