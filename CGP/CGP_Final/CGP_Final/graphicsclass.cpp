@@ -11,7 +11,7 @@ GraphicsClass::GraphicsClass()
 	m_LightShader = 0;
 	m_Light = 0;
 	m_Card = 0;
-	
+
 	for (int i = 0; i < 3; i++)
 		m_Fire[i] = 0;
 	for (int i = 0; i < 3; i++)
@@ -24,9 +24,12 @@ GraphicsClass::GraphicsClass()
 	blink = 0;
 
 	getCard = false;
-	turnOnLight = true;
+	turnOnLight = false;
 	isInteractDoor = false;
 	isInteractEscape = false;
+	isInteractElec = false;
+
+	gameClear = false;
 
 	num_of_polygons = 0;
 	num_of_objects = 0;
@@ -44,6 +47,7 @@ GraphicsClass::GraphicsClass()
 	m_SkyDomeShader = 0;
 
 	m_FireShader = 0;
+	m_Electric = 0;
 }
 
 
@@ -115,7 +119,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 			return false;
 		}
 
-		result = m_Fire[i]->Initialize(m_D3D->GetDevice(), "../CGP_Final/data/square.txt", L"../CGP_Final/data/fire01.dds", 
+		result = m_Fire[i]->Initialize(m_D3D->GetDevice(), "../CGP_Final/data/square.txt", L"../CGP_Final/data/fire01.dds",
 			L"../CGP_Final/data/noise01.dds", L"../CGP_Final/data/alpha01.dds");
 
 		if (!result)
@@ -197,6 +201,15 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		result = m_Door[i]->Initialize(m_D3D->GetDevice(), "../CGP_Final/data/Map/door.obj", L"../CGP_Final/data/Map/map21.jpg", L"../CGP_Final/data/Map/map22.jpg", L"../CGP_Final/data/Map/map23.jpg", L"../CGP_Final/data/Map/map23.jpg");
 	}
 
+	m_Electric = new ModelClass;
+	if (!m_Electric)
+	{
+		return false;
+	}
+
+	// Initialize the model[Map3] object.
+	result = m_Electric->Initialize(m_D3D->GetDevice(), "../CGP_Final/data/Electric/asd.obj", L"../CGP_Final/data/Electric/quadro de energia (Bump).jpg", L"../CGP_Final/data/Electric/quadro de energia (Bump).jpg", L"../CGP_Final/data/Electric/quadro de energia (Bump).jpg", L"../CGP_Final/data/Electric/quadro de energia (Bump).jpg");
+
 	if (!result)
 	{
 		MessageBox(hwnd, L"Could not initialize the door object.", L"Error", MB_OK);
@@ -231,7 +244,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_Light->SetDirection(0.0f, -0.5f, 0.5f);
 	m_Light->SetSpecularColor(1.0f, 1.0f, 1.0f, 1.0f);
 	m_Light->SetSpecularPower(100.0f);
-	
+
 	// Create the texture shader object.
 	m_TextureShader = new TextureShaderClass;
 	if (!m_TextureShader)
@@ -435,6 +448,13 @@ void GraphicsClass::Shutdown()
 		m_SkyDomeShader = 0;
 	}
 
+	if (m_Electric)
+	{
+		m_Electric->Shutdown();
+		delete m_Electric;
+		m_Electric = 0;
+	}
+
 	return;
 }
 
@@ -443,14 +463,14 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 {
 	bool result;
 	static float rotation = 0.0f;
-	
+
 	// Update the rotation variable each frame.
 	rotation += (float)D3DX_PI * 0.005f;
 	if (rotation > 360.0f)
 	{
 		rotation -= 360.0f;
 	}
-	
+
 	if (turnOnLight)
 	{
 		blink += 1;
@@ -458,7 +478,7 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 		if (blink > 120)
 			blink = 0;
 	}
-	
+
 	// Set the location of the mouse.
 	result = m_Text->SetMousePosition(mouseX, mouseY, m_D3D->GetDeviceContext());
 	if (!result)
@@ -510,6 +530,12 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 		return false;
 	}
 
+	result = m_Text->SetIsClear(gameClear, m_D3D->GetDeviceContext());
+	if (!result)
+	{
+		return false;
+	}
+
 	// Render the graphics scene.
 	result = Render(rotation);
 	if (!result)
@@ -525,6 +551,7 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 
 	if (mapNum == 0)
 	{
+		isInteractElec = false;
 		if (inCorridor == 0)
 		{
 			isInteractEscape = false;
@@ -691,7 +718,7 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 				mapNum = 1;
 				inCorridor = 4;
 			}
-			
+
 			if (m_Camera->GetPosition().z < -100.0f && m_Camera->GetPosition().z > -140.0f)
 			{
 				if (m_Camera->GetPosition().x < -165.0f)
@@ -739,6 +766,7 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 		if (inCorridor == 0)
 		{
 			isInteractDoor = false;
+			isInteractElec = false;
 			if (m_Camera->GetPosition().x > -335.0f)
 				camRotX -= 0.75f;
 			else if (m_Camera->GetPosition().x < -445.0f)
@@ -783,6 +811,9 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 			else if (m_Camera->GetPosition().z <= -400.0f &&
 				(m_Camera->GetPosition().x > -425.0f && m_Camera->GetPosition().x < -355.0f))
 				isInteractDoor = true;
+			else if (m_Camera->GetPosition().z <= -398.0f &&
+				(m_Camera->GetPosition().x > -355.0f && m_Camera->GetPosition().x < -335.0f))
+				isInteractElec = true;
 		}
 		else if (inCorridor == 1)
 		{
@@ -944,12 +975,19 @@ bool GraphicsClass::Frame(int mouseX, int mouseY, int fps, int cpu, float frameT
 			}
 		}
 	}
-	
-	m_Camera->SetPosition(camRotX, camRotY, camRotZ);
 
-	if ((m_Camera->GetPosition().x >= -1.0f && m_Camera->GetPosition().x <= 1.0f) &&
-		(m_Camera->GetPosition().z >= 4.5f && m_Camera->GetPosition().z <= 5.5f))
+	if (!gameClear)
+		m_Camera->SetPosition(camRotX, camRotY, camRotZ);
+	else
+	{
+		m_Camera->SetPosition(0.0f, 45.0f, 275.0f);
+		m_Camera->SetRotation(0.0f, 0.0f, 0.0f);
+	}
+		//-435.0f, 45.0f, 320.0f
+	if ((m_Camera->GetPosition().x >= -436.0f && m_Camera->GetPosition().x <= -434.0f) &&
+		(m_Camera->GetPosition().z >= 318.5f && m_Camera->GetPosition().z <= 321.5f))
 		getCard = true;
+
 
 	return true;
 }
@@ -965,6 +1003,9 @@ bool GraphicsClass::Render(float rotation)
 	D3DXMATRIX Map2MoveMatrix;
 	D3DXMATRIX Map2Scaling;
 	D3DXMATRIX Map2Matrix;
+	D3DXMATRIX ElectricMatrix;
+	D3DXMATRIX ElectricMoveMatrix;
+	D3DXMATRIX ElectricScaling;
 	bool result;
 
 	D3DXVECTOR3 cameraPosition;
@@ -1019,6 +1060,7 @@ bool GraphicsClass::Render(float rotation)
 	for (int i = 0; i < 10; i++)
 		m_D3D->GetWorldMatrix(doorMoveMatrix[i]);
 	m_D3D->GetWorldMatrix(Map2Matrix);
+	m_D3D->GetWorldMatrix(ElectricMatrix);
 
 	for (int i = 0; i < 3; i++)
 		m_D3D->GetWorldMatrix(worldMatrixFire[i]);
@@ -1063,9 +1105,9 @@ bool GraphicsClass::Render(float rotation)
 	D3DXMatrixRotationY(&worldMatrix[4], lX * 0.03f * 0.0174532925f);
 	D3DXMatrixTranslation(&worldMatrix[5], m_Camera->GetPosition().x, m_Camera->GetPosition().y, m_Camera->GetPosition().z);
 
-	D3DXMatrixScaling(&worldMatrix[6], 0.5f, 0.5f, 0.5f);
-	D3DXMatrixRotationY(&worldMatrix[7], 1.75f);
-	D3DXMatrixTranslation(&worldMatrix[8], 0.0f, 45.0f, 5.0f);
+	D3DXMatrixScaling(&worldMatrix[6], 1.7f, 1.7f, 1.7f);
+	D3DXMatrixRotationY(&worldMatrix[7], rotation);
+	D3DXMatrixTranslation(&worldMatrix[8], -435.0f, 37.5f, 320.0f);
 
 	//m_D3D->SetWorldMatrix(worldMatrix1);
 
@@ -1083,9 +1125,18 @@ bool GraphicsClass::Render(float rotation)
 		for (int i = 6; i < 9; i++)
 			worldMatrix[0] *= worldMatrix[i];
 
-	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Card->GetIndexCount(), worldMatrix[0], viewMatrix, projectionMatrix,
-		*m_Card->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
-		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+	if (!gameClear)
+	{
+		result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Card->GetIndexCount(), worldMatrix[0], viewMatrix, projectionMatrix,
+			*m_Card->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
+			m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+	}
+	else
+	{
+		result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Card->GetIndexCount(), ElectricMatrix, viewMatrix, projectionMatrix,
+			*m_Card->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
+			m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+	}
 	if (!result)
 	{
 		return false;
@@ -1127,6 +1178,12 @@ bool GraphicsClass::Render(float rotation)
 
 	D3DXMatrixScaling(&worldMatrix[9], 0.3f, 0.3f, 0.3f);
 	D3DXMatrixScaling(&doorScalingMatrix, 0.3f, 0.3f, 0.3f);
+
+	// 차단기
+
+	D3DXMatrixScaling(&ElectricScaling, 2.5f, 2.5f, 2.5f);
+	D3DXMatrixTranslation(&ElectricMoveMatrix, -135.0f, 20.0f, -165.0f);
+	D3DXMatrixMultiply(&ElectricMatrix, &ElectricMoveMatrix, &ElectricScaling);
 
 	//m_D3D->SetWorldMatrix(worldMatrix1);
 	// 문 배열 곱하기
@@ -1298,7 +1355,7 @@ bool GraphicsClass::Render(float rotation)
 	m_Door[0]->Render(m_D3D->GetDeviceContext());
 	num_of_objects++;
 	num_of_polygons += m_Door[0]->GetIndexCount();
-
+	
 	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Door[0]->GetIndexCount(), doorRotateMatrix[2] * doorMatrix[6], viewMatrix, projectionMatrix1,
 		*m_Door[0]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
 		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
@@ -1311,9 +1368,18 @@ bool GraphicsClass::Render(float rotation)
 	num_of_objects++;
 	num_of_polygons += m_Door[0]->GetIndexCount();
 
-	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Door[0]->GetIndexCount(), doorRotateMatrix[1] * doorMatrix[7], viewMatrix, projectionMatrix1,
-		*m_Door[0]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
-		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+	if (gameClear)
+	{
+		result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Door[0]->GetIndexCount(), ElectricMatrix, viewMatrix, projectionMatrix1,
+			*m_Door[0]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
+			m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+	}
+	else
+	{
+		result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Door[0]->GetIndexCount(), doorRotateMatrix[1] * doorMatrix[7], viewMatrix, projectionMatrix1,
+			*m_Door[0]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
+			m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+	}
 	if (!result)
 	{
 		return false;
@@ -1337,6 +1403,18 @@ bool GraphicsClass::Render(float rotation)
 
 	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Door[0]->GetIndexCount(), doorRotateMatrix[1] * doorMatrix[9], viewMatrix, projectionMatrix1,
 		*m_Door[0]->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
+		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
+	if (!result)
+	{
+		return false;
+	}
+
+	m_Electric->Render(m_D3D->GetDeviceContext());
+	num_of_objects++;
+	num_of_polygons += m_Electric->GetIndexCount();
+
+	result = m_LightShader->Render(m_D3D->GetDeviceContext(), m_Electric->GetIndexCount(), doorRotateMatrix[0] * ElectricMatrix, viewMatrix, projectionMatrix1,
+		*m_Electric->GetTexture(), m_Light->GetDirection(), m_Light->GetAmbientColor(), m_Light->GetDiffuseColor(),
 		m_Camera->GetPosition(), m_Light->GetSpecularColor(), m_Light->GetSpecularPower());
 	if (!result)
 	{
@@ -1376,10 +1454,54 @@ bool GraphicsClass::Render(float rotation)
 
 	// Put the square model vertex and index buffers on the graphics pipeline to prepare them for drawing.
 	m_Fire[0]->Render(m_D3D->GetDeviceContext());
+	num_of_objects++;
+	num_of_polygons += m_Fire[0]->GetIndexCount();
 
 	// Render the square model using the fire shader.
 	result = m_FireShader->Render(m_D3D->GetDeviceContext(), m_Fire[0]->GetIndexCount(), worldMatrixFire[0], viewMatrix, projectionMatrix,
 		m_Fire[0]->GetTexture1(), m_Fire[0]->GetTexture2(), m_Fire[0]->GetTexture3(), frameTime, scrollSpeeds,
+		scales, distortion1, distortion2, distortion3, distortionScale, distortionBias);
+
+	if (!result)
+	{
+		return false;
+	}
+
+	D3DXMatrixScaling(&worldMatrixFireSca[1], 55.0f, 40.0f, 1.0f);
+	D3DXMatrixRotationY(&worldMatrixFireRot[1], (m_Camera->GetRotation().y + 1.57f) * 0.0174532925f);
+	D3DXMatrixMultiply(&worldMatrixFire[1], &worldMatrixFireSca[1], &worldMatrixFireRot[1]);
+	D3DXMatrixTranslation(&worldMatrixFireTrs[1], -435.0f, 40.0f, -380.0f);
+	worldMatrixFire[1] *= worldMatrixFireTrs[1];
+
+	// Put the square model vertex and index buffers on the graphics pipeline to prepare them for drawing.
+	m_Fire[1]->Render(m_D3D->GetDeviceContext());
+	num_of_objects++;
+	num_of_polygons += m_Fire[1]->GetIndexCount();
+
+	// Render the square model using the fire shader.
+	result = m_FireShader->Render(m_D3D->GetDeviceContext(), m_Fire[1]->GetIndexCount(), worldMatrixFire[1], viewMatrix, projectionMatrix,
+		m_Fire[1]->GetTexture1(), m_Fire[1]->GetTexture2(), m_Fire[1]->GetTexture3(), frameTime, scrollSpeeds,
+		scales, distortion1, distortion2, distortion3, distortionScale, distortionBias);
+
+	if (!result)
+	{
+		return false;
+	}
+
+	D3DXMatrixScaling(&worldMatrixFireSca[2], 55.0f, 40.0f, 1.0f);
+	D3DXMatrixRotationY(&worldMatrixFireRot[2], (m_Camera->GetRotation().y + 1.57f) * 0.0174532925f);
+	D3DXMatrixMultiply(&worldMatrixFire[2], &worldMatrixFireSca[2], &worldMatrixFireRot[2]);
+	D3DXMatrixTranslation(&worldMatrixFireTrs[2], -325.0f, 40.0f, 0.0f);
+	worldMatrixFire[2] *= worldMatrixFireTrs[2];
+
+	// Put the square model vertex and index buffers on the graphics pipeline to prepare them for drawing.
+	m_Fire[2]->Render(m_D3D->GetDeviceContext());
+	num_of_objects++;
+	num_of_polygons += m_Fire[2]->GetIndexCount();
+
+	// Render the square model using the fire shader.
+	result = m_FireShader->Render(m_D3D->GetDeviceContext(), m_Fire[2]->GetIndexCount(), worldMatrixFire[2], viewMatrix, projectionMatrix,
+		m_Fire[2]->GetTexture1(), m_Fire[2]->GetTexture2(), m_Fire[2]->GetTexture3(), frameTime, scrollSpeeds,
 		scales, distortion1, distortion2, distortion3, distortionScale, distortionBias);
 
 	if (!result)

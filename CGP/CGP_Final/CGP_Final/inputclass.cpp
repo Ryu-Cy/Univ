@@ -272,3 +272,13 @@ float InputClass::GetMouselY()
 {
 	return m_mouseState.lY;
 }
+
+bool InputClass::GetSpaceKey()
+{
+	if (m_keyboardState[DIK_SPACE] & 0x80)
+	{
+		return true;
+	}
+
+	return false;
+}

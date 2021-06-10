@@ -17,6 +17,7 @@ TextClass::TextClass()
 	m_sentence6 = 0;
 	m_sentence7 = 0;
 	m_sentence8 = 0;
+	m_sentence9 = 0;
 }
 
 
@@ -179,6 +180,19 @@ bool TextClass::Initialize(ID3D11Device* device, ID3D11DeviceContext* deviceCont
 		return false;
 	}
 
+	result = InitializeSentence(&m_sentence9, 16, device);
+	if (!result)
+	{
+		return false;
+	}
+
+	// Now update the sentence vertex buffer with the new string information.
+	result = UpdateSentence(m_sentence9, "Goodbye", 100, 400, 1.0f, 1.0f, 0.0f, deviceContext);
+	if (!result)
+	{
+		return false;
+	}
+
 	return true;
 }
 
@@ -209,6 +223,8 @@ void TextClass::Shutdown()
 	// Release the second sentence.
 	ReleaseSentence(&m_sentence8);
 
+	// Release the second sentence.
+	ReleaseSentence(&m_sentence9);
 
 	// Release the font shader object.
 	if (m_FontShader)
@@ -281,6 +297,12 @@ bool TextClass::Render(ID3D11DeviceContext* deviceContext, D3DXMATRIX worldMatri
 	}
 
 	result = RenderSentence(deviceContext, m_sentence8, worldMatrix, orthoMatrix);
+	if (!result)
+	{
+		return false;
+	}
+
+	result = RenderSentence(deviceContext, m_sentence9, worldMatrix, orthoMatrix);
 	if (!result)
 	{
 		return false;
@@ -786,5 +808,37 @@ bool TextClass::SetScreen(ID3D11DeviceContext* deviceContext)
 	{
 		return false;
 	}
+	return true;
+}
+
+bool TextClass::SetIsClear(bool isClear, ID3D11DeviceContext* deviceContext)
+{
+	char CardString[24];
+	bool result;
+
+
+	// Setup the cpu string.
+	strcpy_s(CardString, "Game Clear!");
+
+	// Update the sentence vertex buffer with the new string information.
+	if (isClear)
+	{
+		result = UpdateSentence(m_sentence9, CardString, 360, 200, 0.0f, 1.0f, 0.0f, deviceContext);
+		if (!result)
+		{
+			return false;
+		}
+	}
+	else
+	{
+		result = UpdateSentence(m_sentence9, "", 360, 200, 0.0f, 1.0f, 0.0f, deviceContext);
+		if (!result)
+		{
+			return false;
+		}
+	}
+
+
+
 	return true;
 }

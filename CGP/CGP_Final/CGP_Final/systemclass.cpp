@@ -215,7 +215,8 @@ void SystemClass::Run()
 		}
 		m_Graphics->lX += m_Input->GetMouselX();
 		m_Graphics->lY += m_Input->GetMouselY();
-		m_Graphics->GetCamera()->SetRotation(m_Graphics->lY * 0.03f, m_Graphics->lX * 0.03f, 0.0f);
+		if (!m_Graphics->gameClear)
+			m_Graphics->GetCamera()->SetRotation(m_Graphics->lY * 0.03f, m_Graphics->lX * 0.03f, 0.0f);
 
 	}
 
@@ -226,7 +227,8 @@ void SystemClass::Run()
 bool SystemClass::Frame()
 {
 	bool result;
-	int mouseX, mouseY;
+	int mouseX = 0;
+	int mouseY = 0;
 
 		// Update the system stats.
 	m_Timer->Frame();
@@ -247,13 +249,22 @@ bool SystemClass::Frame()
 	{
 		m_Graphics->GetCamera()->CameraMove(m_Input->GetMoveState());
 	}*/
-	m_Graphics->GetCamera()->CameraMove(m_Input->GetMoveState());
+	if (!m_Graphics->gameClear)
+		m_Graphics->GetCamera()->CameraMove(m_Input->GetMoveState());
+		
+	if (m_Graphics->isInteractElec)
+		if (m_Input->GetSpaceKey())
+			m_Graphics->turnOnLight = true;
+
+	if (m_Graphics->getCard)
+		if (m_Graphics->isInteractEscape)
+			m_Graphics->gameClear = true;
 
 	// Get the location of the mouse from the input object,
 	m_Input->GetMouseLocation(mouseX, mouseY);
 
 	// Do the frame processing for the graphics object.
-	//result = m_Graphics->Frame(mouseX, mouseY);
+		//result = m_Graphics->Frame(mouseX, mouseY);
 	result = m_Graphics->Frame(mouseX, mouseY, m_Fps->GetFps(), m_Cpu->GetCpuPercentage(), m_Timer->GetTime());
 	if (!result)
 	{

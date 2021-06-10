@@ -45,6 +45,8 @@ public:
 	float GetMouselX();
 	float GetMouselY();
 
+	bool GetSpaceKey();
+
 private:
 	bool ReadKeyboard();
 	bool ReadMouse();

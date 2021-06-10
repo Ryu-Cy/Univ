@@ -66,6 +66,9 @@ public:
 	bool turnOnLight;
 	bool isInteractDoor;
 	bool isInteractEscape;
+	bool isInteractElec;
+
+	bool gameClear;
 
 	int num_of_polygons;
 	int num_of_objects;
@@ -76,6 +79,7 @@ private:
 	ModelClass* m_Card;
 	ModelClass* m_Map[3];
 	ModelClass* m_Door[2];
+	ModelClass* m_Electric;
 	FireClass* m_Fire[3];
 	LightShaderClass* m_LightShader;
 	LightClass* m_Light;

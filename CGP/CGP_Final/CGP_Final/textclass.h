@@ -47,6 +47,7 @@ public:
 
 	bool SetNeedCard(bool, bool, ID3D11DeviceContext*);
 	bool SetLocked(bool, bool, ID3D11DeviceContext*);
+	bool SetIsClear(bool, ID3D11DeviceContext*);
 
 	bool SetScreen(ID3D11DeviceContext*);
 
@@ -69,6 +70,7 @@ private:
 	SentenceType* m_sentence6;
 	SentenceType* m_sentence7;
 	SentenceType* m_sentence8;
+	SentenceType* m_sentence9;
 };
 
 #endif
