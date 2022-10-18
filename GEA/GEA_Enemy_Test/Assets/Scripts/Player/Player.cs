@@ -4,11 +4,12 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    public float speed = 5f;
+    public float Speed = 5f;
     private Rigidbody characterRigidbody;
 
-    
     public GameObject Bullet;
+
+    public float Hp = 100.0f;
 
     // Start is called before the first frame update
     void Start()
@@ -23,12 +24,17 @@ public class Player : MonoBehaviour
         float inputZ = Input.GetAxis("Vertical");
  
         Vector3 velocity = new Vector3(inputX, 0, inputZ);
-        velocity *= speed;
+        velocity *= Speed;
         characterRigidbody.velocity = velocity;
 
         if(Input.GetKeyDown(KeyCode.Space))
         {
             Instantiate(Bullet, this.transform.position, this.transform.rotation);
         }
+    }
+
+    public void TakeDamage(float value)
+    {
+        Hp -= value;
     }
 }

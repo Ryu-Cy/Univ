@@ -6,6 +6,7 @@ public class Enemy : MonoBehaviour
 {
     public EnemyStatus Stat;
     public EnemyType Type;
+    public EnemyElement Element;
 
     public float EnemySight;
     public float Timer;
@@ -20,20 +21,26 @@ public class Enemy : MonoBehaviour
         SLEEP
     }
 
+    private Rigidbody rigid;
+
     // Start is called before the first frame update
     void Start()
     {
         Stat = new EnemyStatus();
-        Stat = Stat.SetEnemyStatus(Type);
+        Stat = Stat.SetEnemyStatus(Type, Element);
 
         Timer = 0.0f;
 
         State = STATE.IDLE;
+
+        rigid = GetComponent<Rigidbody>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        rigid.velocity = Vector3.zero;
+
         findPlayer();
 
         if(State != STATE.CHASE && State != STATE.RUNAWAY)
@@ -49,7 +56,7 @@ public class Enemy : MonoBehaviour
     {
         Timer += Time.deltaTime;
 
-        if(Timer >= 10.0f)
+        if(Timer >= 5.0f)
         {
             if(State == STATE.IDLE)
                 State = STATE.PATROL;
@@ -94,7 +101,8 @@ public class Enemy : MonoBehaviour
 
     public void ReCharge()
     {
-        if(Stat.hp == 100.0f)
+        if(Stat.hp == Stat.maxHp)
             State = STATE.IDLE;
     }
+
 }
