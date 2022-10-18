@@ -124,8 +124,11 @@ NavMeshSettings:
       m_Flags: 0
   m_NavMeshData: {fileID: 23800000, guid: 1eaaa9bbc9b0a474eb035ee25b22f375, type: 2}
 <<<<<<< HEAD
+<<<<<<< HEAD
 --- !u!4 &156141747 stripped
 =======
+=======
+>>>>>>> d61e784c9deb707f3bc6f4d7fe23e8cb83ed716f
 --- !u!1001 &22606769
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -200,6 +203,9 @@ PrefabInstance:
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 205dac7c3e73ef6448dbe5eaa8b2de6d, type: 3}
 --- !u!4 &327135162 stripped
+<<<<<<< HEAD
+>>>>>>> d61e784c9deb707f3bc6f4d7fe23e8cb83ed716f
+=======
 >>>>>>> d61e784c9deb707f3bc6f4d7fe23e8cb83ed716f
 Transform:
   m_CorrespondingSourceObject: {fileID: 3869758077016367628, guid: 8533986a6acb7ee49ae036fb515a6f82, type: 3}
@@ -301,7 +307,10 @@ Transform:
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> d61e784c9deb707f3bc6f4d7fe23e8cb83ed716f
 --- !u!1001 &1143787349
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -444,6 +453,9 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4ff3990909113fb4e9c651d635c72875, type: 3}
+<<<<<<< HEAD
+>>>>>>> d61e784c9deb707f3bc6f4d7fe23e8cb83ed716f
+=======
 >>>>>>> d61e784c9deb707f3bc6f4d7fe23e8cb83ed716f
 --- !u!1 &1535710184
 GameObject:
@@ -539,7 +551,10 @@ Transform:
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> d61e784c9deb707f3bc6f4d7fe23e8cb83ed716f
 --- !u!1001 &1648852286
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -613,6 +628,9 @@ PrefabInstance:
       objectReference: {fileID: 327135162}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b7a138d450c746c4dac18395ff45a232, type: 3}
+<<<<<<< HEAD
+>>>>>>> d61e784c9deb707f3bc6f4d7fe23e8cb83ed716f
+=======
 >>>>>>> d61e784c9deb707f3bc6f4d7fe23e8cb83ed716f
 --- !u!1 &1649176560
 GameObject:
@@ -731,6 +749,7 @@ MonoBehaviour:
   m_RequiresDepthTexture: 0
   m_RequiresColorTexture: 0
   m_Version: 2
+<<<<<<< HEAD
 <<<<<<< HEAD
 --- !u!1001 &549775714343293798
 PrefabInstance:
@@ -865,6 +884,8 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8a3d8a8ecc256dc46832439aee135610, type: 3}
+=======
+>>>>>>> d61e784c9deb707f3bc6f4d7fe23e8cb83ed716f
 =======
 >>>>>>> d61e784c9deb707f3bc6f4d7fe23e8cb83ed716f
 --- !u!1001 &3869758076697300406

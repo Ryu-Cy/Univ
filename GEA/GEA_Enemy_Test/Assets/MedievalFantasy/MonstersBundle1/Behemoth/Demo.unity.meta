@@ -1,5 +1,10 @@
 fileFormatVersion: 2
+<<<<<<<< HEAD:GEA/GEA_Enemy_Test/Assets/MedievalFantasy/MonstersBundle1/Behemoth/Demo.unity.meta
 guid: 6f8834098b3209b4fa8012a8f42de92f
+========
+guid: e4d4ffbe762f6db41bd9d5e601544fa4
+folderAsset: yes
+>>>>>>>> d61e784c9deb707f3bc6f4d7fe23e8cb83ed716f:GEA/GEA_Enemy_Test/Assets/Materials/Bullets.meta
 DefaultImporter:
   externalObjects: {}
   userData: 
