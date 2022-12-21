@@ -163,7 +163,9 @@ class WindowClass(QMainWindow, form_class):
         if self.opened:
             self.save_file(self.opened_file_path)
         else:
-            self.saveAsFuntion()
+            fname = QFileDialog.getSaveFileName(self)
+            if fname[0]:
+                self.save_file(fname[0])
 
     def saveAsFunction(self):
         fname = QFileDialog.getSaveFileName(self)
